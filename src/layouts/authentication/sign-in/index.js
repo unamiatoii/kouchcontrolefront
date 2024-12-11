@@ -1,43 +1,50 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "domain/authSlice";
 
-// react-router-dom components
-import { Link } from "react-router-dom";
-
-// @mui material components
+// Material UI components
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
-// Authentication layout components
 import BasicLayout from "layouts/authentication/components/BasicLayout";
-
-// Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { toast } from "react-toastify";
+import MDButtonSpinner from "components/MDButtonSpinner.js";
 
 function Basic() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      dispatch(loginUser({ email, password })).then((result) => {
+        if (result.meta.requestStatus === "fulfilled") {
+          setLoading(true);
+          toast.success("Connexion réussie! Bienvenue.");
+          navigate("/dashboard");
+        } else {
+          setLoading(true);
+          toast.error("Connexion échouée. Veuillez vérifier vos identifiants.");
+        }
+      });
+    } catch (error) {
+      setLoading(true);
+      console.error("Login failed", error);
+      alert("Erreur de connexion. Veuillez réessayer.");
+    }
+  };
 
   return (
     <BasicLayout image={bgImage}>
@@ -58,12 +65,26 @@ function Basic() {
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <MDBox component="form" onSubmit={handleLogin} role="form">
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput
+                type="email"
+                label="Email"
+                fullWidth
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput
+                type="password"
+                label="Password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -78,9 +99,7 @@ function Basic() {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
-              </MDButton>
+              <MDButtonSpinner loading={loading}>Sign in</MDButtonSpinner>
             </MDBox>
           </MDBox>
         </MDBox>

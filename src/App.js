@@ -52,6 +52,7 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 // Images
 import brandWhite from "assets/images/logos/logo.jpeg";
 import brandDark from "assets/images/logos/logo.jpeg";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
