@@ -19,7 +19,8 @@ function AccordionMenu({ menuKey, name, icon, collapseName, children }) {
           alignItems: "center",
           cursor: "pointer",
           padding: "10px",
-          backgroundColor: "transparent", // Arrière-plan transparent
+          fontWeight: "bolder",
+          backgroundColor: "transparent",
           borderRadius: "5px",
           transition: "background-color 0.3s ease",
         }}
