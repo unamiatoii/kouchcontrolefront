@@ -1,51 +1,19 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-/** 
-  All of the routes for the Material Dashboard 2 React are added here,
-  You can add a new route, customize the routes and delete the routes here.
-
-  Once you add a new route on this file it will be visible automatically on
-  the Sidenav.
-
-  For adding a new route you can follow the existing routes in the routes array.
-  1. The `type` key with the `collapse` value is used for a route.
-  2. The `type` key with the `title` value is used for a title inside the Sidenav. 
-  3. The `type` key with the `divider` value is used for a divider between Sidenav items.
-  4. The `name` key is used for the name of the route on the Sidenav.
-  5. The `key` key is used for the key of the route (It will help you with the key prop inside a loop).
-  6. The `icon` key is used for the icon of the route on the Sidenav, you have to add a node.
-  7. The `collapse` key is used for making a collapsible item on the Sidenav that has other routes
-  inside (nested routes), you need to pass the nested routes inside an array as a value for the `collapse` key.
-  8. The `route` key is used to store the route location which is used for the react router.
-  9. The `href` key is used to store the external links location.
-  10. The `title` key is only for the item with the type of `title` and its used for the title text on the Sidenav.
-  10. The `component` key is used to store the component of its route.
-*/
-
-// Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+import ArticlesList from "layouts/dashboard";
+import AddArticle from "layouts/dashboard";
+import TransferArticle from "layouts/dashboard";
+import SitesList from "layouts/dashboard";
+import NeedsPlanning from "layouts/dashboard";
+import ConsumptionTracking from "layouts/dashboard";
+import DailyReport from "layouts/dashboard";
+import WarehousesList from "layouts/dashboard";
+import TransfersHistory from "layouts/dashboard";
+import RegisterOrder from "layouts/dashboard";
+import OrdersList from "layouts/dashboard";
+import Quotations from "layouts/dashboard";
+import UsersList from "layouts/dashboard";
+import AlertSettings from "layouts/dashboard";
 
-// @mui icons
 import Icon from "@mui/material/Icon";
 
 const routes = [
@@ -59,59 +27,127 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    name: "Gestion des stocks",
+    key: "stocks",
+    icon: <Icon fontSize="small">inventory_2</Icon>,
+    children: [
+      {
+        name: "Liste des articles",
+        key: "articles-list",
+        route: "/stocks/articles-list",
+        component: <ArticlesList />,
+      },
+      {
+        name: "Ajouter un article",
+        key: "add-article",
+        route: "/stocks/add-article",
+        component: <AddArticle />,
+      },
+      {
+        name: "Transférer un article",
+        key: "transfer-article",
+        route: "/stocks/transfer-article",
+        component: <TransferArticle />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    name: "Gestion des chantiers",
+    key: "sites",
+    icon: <Icon fontSize="small">engineering</Icon>,
+    children: [
+      {
+        name: "Liste des chantiers",
+        key: "sites-list",
+        route: "/sites/sites-list",
+        component: <SitesList />,
+      },
+      {
+        name: "Planifications des besoins",
+        key: "needs-planning",
+        route: "/sites/needs-planning",
+        component: <NeedsPlanning />,
+      },
+      {
+        name: "Suivi des consommations",
+        key: "consumption-tracking",
+        route: "/sites/consumption-tracking",
+        component: <ConsumptionTracking />,
+      },
+      {
+        name: "Rapport journalier",
+        key: "daily-report",
+        route: "/sites/daily-report",
+        component: <DailyReport />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
+    name: "Entrepôts",
+    key: "warehouses",
+    icon: <Icon fontSize="small">store</Icon>,
+    children: [
+      {
+        name: "Liste des entrepôts",
+        key: "warehouses-list",
+        route: "/warehouses/warehouses-list",
+        component: <WarehousesList />,
+      },
+      {
+        name: "Historique des transferts",
+        key: "transfers-history",
+        route: "/warehouses/transfers-history",
+        component: <TransfersHistory />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
+    name: "Gestion commerciale",
+    key: "commercial",
+    icon: <Icon fontSize="small">shopping_cart</Icon>,
+    children: [
+      {
+        name: "Enregistrer une commande",
+        key: "register-order",
+        route: "/commercial/register-order",
+        component: <RegisterOrder />,
+      },
+      {
+        name: "Liste des commandes",
+        key: "orders-list",
+        route: "/commercial/orders-list",
+        component: <OrdersList />,
+      },
+      {
+        name: "Devis",
+        key: "quotations",
+        route: "/commercial/quotations",
+        component: <Quotations />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
+    name: "Administration",
+    key: "admin",
+    icon: <Icon fontSize="small">admin_panel_settings</Icon>,
+    children: [
+      {
+        name: "Liste des utilisateurs",
+        key: "users-list",
+        route: "/admin/users-list",
+        component: <UsersList />,
+      },
+      {
+        name: "Configurations alertes/Seuil",
+        key: "alert-settings",
+        route: "/admin/alert-settings",
+        component: <AlertSettings />,
+      },
+    ],
   },
 ];
 
