@@ -3,6 +3,7 @@ import ArticlesList from "pages/stocks/ListArticles";
 import AddArticle from "pages/stocks/AddArticle";
 import TransferArticle from "pages/stocks/TransfertArticleList";
 import SitesList from "pages/chantiers/ListChantiers";
+import Chantiers from "pages/chantiers/ListChantiers";
 import NeedsPlanning from "pages/chantiers/Besoins";
 import ConsumptionTracking from "pages/chantiers/SuiviConsommation"; //
 import DailyReport from "pages/chantiers/RapportJournalier";
@@ -11,7 +12,7 @@ import TransfersHistory from "layouts/dashboard";
 import RegisterOrder from "layouts/dashboard";
 import OrdersList from "layouts/dashboard";
 import Quotations from "layouts/dashboard";
-import UsersList from "layouts/dashboard";
+import UsersList from "pages/administration/ListUsers";
 import AlertSettings from "layouts/dashboard";
 
 import Icon from "@mui/material/Icon";
