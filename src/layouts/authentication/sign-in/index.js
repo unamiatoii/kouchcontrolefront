@@ -19,30 +19,37 @@ function Basic() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
+
     try {
-      dispatch(loginUser({ email, password })).then((result) => {
-        if (result.meta.requestStatus === "fulfilled") {
-          setLoading(true);
-          toast.success("Connexion réussie! Bienvenue.");
-          navigate("/dashboard");
-        } else {
-          setLoading(true);
-          toast.error("Connexion échouée. Veuillez vérifier vos identifiants.");
-        }
-      });
+      const result = await dispatch(loginUser({ email, password }));
+
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("Connexion réussie! Bienvenue.");
+        navigate("/dashboard");
+      } else {
+        const errorMsg =
+          result.payload?.message || "Connexion échouée. Veuillez vérifier vos identifiants.";
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
+      }
     } catch (error) {
-      setLoading(true);
       console.error("Login failed", error);
-      alert("Erreur de connexion. Veuillez réessayer.");
+      const errorMsg = error.message || "Erreur de connexion. Veuillez réessayer.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,10 +68,17 @@ function Basic() {
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Sign in
+            Authentification
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
+          {errorMessage && (
+            <MDBox mt={2} mb={3} textAlign="center">
+              <MDTypography variant="caption" color="error">
+                {errorMessage}
+              </MDTypography>
+            </MDBox>
+          )}
           <MDBox component="form" onSubmit={handleLogin} role="form">
             <MDBox mb={2}>
               <MDInput
@@ -73,6 +87,8 @@ function Basic() {
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                error={!!errorMessage}
+                helperText={errorMessage && "Veuillez entrer un email valide."}
                 required
               />
             </MDBox>
@@ -83,6 +99,8 @@ function Basic() {
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                error={!!errorMessage}
+                helperText={errorMessage && "Veuillez entrer un mot de passe valide."}
                 required
               />
             </MDBox>
@@ -95,11 +113,11 @@ function Basic() {
                 onClick={handleSetRememberMe}
                 sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
               >
-                &nbsp;&nbsp;Remember me
+                &nbsp;&nbsp;Se souvenir de moi
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButtonSpinner loading={loading}>Sign in</MDButtonSpinner>
+              <MDButtonSpinner loading={loading}>SE CONNECTER</MDButtonSpinner>
             </MDBox>
           </MDBox>
         </MDBox>

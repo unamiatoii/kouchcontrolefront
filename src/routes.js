@@ -1,11 +1,11 @@
 import Dashboard from "layouts/dashboard";
-import ArticlesList from "layouts/dashboard";
-import AddArticle from "layouts/dashboard";
-import TransferArticle from "layouts/dashboard";
-import SitesList from "layouts/dashboard";
-import NeedsPlanning from "layouts/dashboard";
-import ConsumptionTracking from "layouts/dashboard";
-import DailyReport from "layouts/dashboard";
+import ArticlesList from "pages/stocks/ListArticles";
+import AddArticle from "pages/stocks/AddArticle";
+import TransferArticle from "pages/stocks/TransfertArticleList";
+import SitesList from "pages/chantiers/ListChantiers";
+import NeedsPlanning from "pages/chantiers/Besoins";
+import ConsumptionTracking from "pages/chantiers/SuiviConsommation"; //
+import DailyReport from "pages/chantiers/RapportJournalier";
 import WarehousesList from "layouts/dashboard";
 import TransfersHistory from "layouts/dashboard";
 import RegisterOrder from "layouts/dashboard";
@@ -19,12 +19,11 @@ import Icon from "@mui/material/Icon";
 const routes = [
   {
     type: "collapse",
-    name: "Dashboard",
+    name: "Tableau de bord",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-    isOpen: false,
   },
   {
     type: "collapse",

@@ -1,30 +1,41 @@
-import { useState, useEffect, useMemo } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
+
+// Custom Components
 import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import Configurator from "examples/Configurator";
+
+// Themes
 import theme from "assets/theme";
-import themeRTL from "assets/theme/theme-rtl";
 import themeDark from "assets/theme-dark";
-import themeDarkRTL from "assets/theme-dark/theme-rtl";
-import rtlPlugin from "stylis-plugin-rtl";
-import { CacheProvider } from "@emotion/react";
-import createCache from "@emotion/cache";
+
+// Authentication
+import SignIn from "layouts/authentication/sign-in";
+
+// Routes
 import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
+
+// Assets
 import brandWhite from "assets/images/logos/logo.jpeg";
 import brandDark from "assets/images/logos/logo.jpeg";
+
+// Notifications
 import { ToastContainer } from "react-toastify";
 
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // State and Context
   const [controller, dispatch] = useMaterialUIController();
   const {
     miniSidenav,
-    direction,
     layout,
     openConfigurator,
     sidenavColor,
@@ -32,17 +43,25 @@ export default function App() {
     whiteSidenav,
     darkMode,
   } = controller;
-
   const [onMouseEnter, setOnMouseEnter] = useState(false);
-  const [rtlCache, setRtlCache] = useState(null);
-  const { pathname } = useLocation();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  useMemo(() => {
-    const cacheRtl = createCache({ key: "rtl", stylisPlugins: [rtlPlugin] });
-    setRtlCache(cacheRtl);
+  // Check for user authentication from localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
   }, []);
 
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  // Handlers
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
       setMiniSidenav(dispatch, false);
@@ -57,26 +76,21 @@ export default function App() {
     }
   };
 
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleConfiguratorOpen = () => {
+    setOpenConfigurator(dispatch, !openConfigurator);
+  };
 
-  useEffect(() => {
-    document.body.setAttribute("dir", direction);
-  }, [direction]);
-
-  useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-  }, [pathname]);
-
+  // Generate Routes with Role-Based Access
   const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
-      if (route.collapse) {
-        return getRoutes(route.collapse);
-      }
+    allRoutes.flatMap((route) => {
+      if (route.collapse) return getRoutes(route.collapse);
+
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        if (!route.roles || route.roles.includes(user?.role?.name)) {
+          return <Route exact path={route.route} element={route.component} key={route.key} />;
+        }
       }
-      return null;
+      return [];
     });
 
   const configsButton = (
@@ -103,57 +117,37 @@ export default function App() {
     </MDBox>
   );
 
-  return direction === "rtl" ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
-        <CssBaseline />
-        {layout === "dashboard" && (
+  return (
+    <ThemeProvider theme={darkMode ? themeDark : theme}>
+      <CssBaseline />
+      {isAuthenticated && user ? (
+        <>
           <>
             <Sidenav
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Gestion de Stock"
+              brandName="KOUCHCONTROL"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
+              role={user.role?.name}
+              user={user}
+              onLogout={() => {
+                localStorage.clear();
+                setUser(null);
+              }}
             />
             <Configurator />
             {configsButton}
           </>
-        )}
-        <Routes>
-          {getRoutes(routes)}
-          <Route
-            path="*"
-            element={<Navigate to={isAuthenticated ? "/dashboard" : "/authentication/sign-in"} />}
-          />
-        </Routes>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={darkMode ? themeDark : theme}>
-      <CssBaseline />
-      {layout === "dashboard" && (
-        <>
-          <Sidenav
-            color={sidenavColor}
-            brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="KOUCHCONTROL"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-          <Configurator />
-          {configsButton}
+          <Routes>{getRoutes(routes)}</Routes>
         </>
+      ) : (
+        <Routes>
+          <Route path="*" element={<SignIn setUser={setUser} />} />
+        </Routes>
       )}
-      <Routes>
-        {getRoutes(routes)}
-        <Route
-          path="*"
-          element={<Navigate to={isAuthenticated ? "/dashboard" : "/authentication/sign-in"} />}
-        />
-      </Routes>
+      <ToastContainer />
     </ThemeProvider>
   );
 }
