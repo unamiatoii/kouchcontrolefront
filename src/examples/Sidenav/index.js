@@ -1,33 +1,28 @@
-import { useEffect } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon";
+import { NavLink, useLocation } from "react-router-dom";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 import SidenavRoot from "examples/Sidenav/SidenavRoot";
+import AccordionMenu from "examples/Accordeons"; // Importation du composant AccordionMenu
+import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
+import Divider from "@mui/material/Divider";
+import Icon from "@mui/material/Icon";
 import {
   useMaterialUIController,
   setMiniSidenav,
   setTransparentSidenav,
   setWhiteSidenav,
 } from "context";
-import AccordionMenu from "examples/Accordeons/index";
 
-function Sidenav({ user, onLogout, brand, brandName, routes, ...rest }) {
-  const role = user?.role;
-
-  // Material UI Controller
+function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
-  const collapseName = location.pathname.replace("/", "");
-
-  // Dynamic Text Color
+  const [activeMenus, setActiveMenus] = useState({});
+  const role = user?.role;
   const textColor =
     transparentSidenav || (whiteSidenav && !darkMode)
       ? "dark"
@@ -35,8 +30,14 @@ function Sidenav({ user, onLogout, brand, brandName, routes, ...rest }) {
       ? "inherit"
       : "white";
 
-  // Close Sidebar
   const closeSidenav = () => setMiniSidenav(dispatch, true);
+
+  const toggleMenu = (key) => {
+    setActiveMenus((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,79 +51,18 @@ function Sidenav({ user, onLogout, brand, brandName, routes, ...rest }) {
     return () => window.removeEventListener("resize", handleResize);
   }, [dispatch, transparentSidenav, whiteSidenav]);
 
-  const renderRoutes = routes
-    .filter((route) => {
-      // Vérifier si l'utilisateur a le rôle nécessaire pour accéder à la route
-      if (route.roles && !route.roles.includes(role)) {
-        return false;
-      }
+  const filterRoutes = (routes) =>
+    routes
+      .map((route) => {
+        if (route.roles && !route.roles.includes(user?.role)) return null;
+        const filteredChildren = route.children?.filter(
+          (child) => !child.roles || child.roles.includes(user?.role)
+        );
+        return { ...route, children: filteredChildren };
+      })
+      .filter(Boolean);
 
-      // Si la route a des sous-routes, vérifier également celles-ci
-      if (route.children) {
-        route.children = route.children.filter((child) => child.roles?.includes(role));
-      }
-      return true;
-    })
-    .map((route) => {
-      const { type, name, icon, title, key, href, children } = route;
-
-      switch (type) {
-        case "collapse":
-          return (
-            <AccordionMenu
-              key={key}
-              name={name}
-              icon={icon}
-              href={href}
-              collapseName={collapseName}
-            >
-              {children &&
-                children.length > 0 &&
-                children.map((child) => {
-                  if (child.roles?.includes(role)) {
-                    return (
-                      <SidenavCollapse
-                        key={child.key}
-                        name={child.name}
-                        icon={child.icon}
-                        route={child.route}
-                      >
-                        <MDBox display="flex" alignItems="center" pl={3}>
-                          <Icon sx={{ fontSize: "1.125rem", mr: 1 }}>{child.icon}</Icon>
-                          <MDTypography variant="button" color={textColor}>
-                            {child.name}
-                          </MDTypography>
-                        </MDBox>
-                      </SidenavCollapse>
-                    );
-                  }
-                  return null;
-                })}
-            </AccordionMenu>
-          );
-        case "title":
-          return (
-            <MDTypography
-              key={key}
-              color={textColor}
-              display="block"
-              variant="caption"
-              fontWeight="bold"
-              textTransform="uppercase"
-              pl={3}
-              mt={2}
-              mb={1}
-              ml={1}
-            >
-              {title}
-            </MDTypography>
-          );
-        case "divider":
-          return <Divider key={key} light={!darkMode || whiteSidenav} />;
-        default:
-          return null;
-      }
-    });
+  const isRouteActive = (routePath) => location.pathname === routePath;
 
   return (
     <SidenavRoot
@@ -130,13 +70,6 @@ function Sidenav({ user, onLogout, brand, brandName, routes, ...rest }) {
       variant="permanent"
       ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
     >
-      {/* User Welcome */}
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
-        <MDTypography variant="h6">Bienvenue, {user?.name}</MDTypography>
-      </MDBox>
-      <Divider />
-
-      {/* Sidebar Header */}
       <MDBox pt={3} pb={1} px={4} textAlign="center">
         <MDBox
           display={{ xs: "block", xl: "none" }}
@@ -158,20 +91,62 @@ function Sidenav({ user, onLogout, brand, brandName, routes, ...rest }) {
             <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
               {brandName}
             </MDTypography>
+            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+              {user?.name}
+            </MDTypography>
+            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+              {role}
+            </MDTypography>
           </MDBox>
         </MDBox>
       </MDBox>
       <Divider light={!darkMode || whiteSidenav} />
+      {/* Menu principal */}
+      <MDBox>
+        {filterRoutes(routes).map(({ key, name, icon, children }) => (
+          <AccordionMenu
+            key={key}
+            menuKey={key}
+            name={name}
+            icon={icon}
+            collapseName={key}
+            isOpen={activeMenus[key] || isRouteActive(`/${key}`)}
+            toggleMenu={() => toggleMenu(key)}
+          >
+            {children?.map((child) => (
+              <NavLink
+                key={child.key}
+                to={child.route}
+                className={isRouteActive(child.route) ? "activeMenuItem" : ""}
+                style={{
+                  display: "block",
+                  textDecoration: "none",
+                  padding: "5px 0",
+                }}
+              >
+                <SidenavCollapse
+                  key={child.key}
+                  name={child.name}
+                  icon={child.icon}
+                  route={child.route}
+                  active={isRouteActive(child.route)}
+                />
+              </NavLink>
+            ))}
+          </AccordionMenu>
+        ))}
 
-      {/* Sidebar Content */}
-      <List>{renderRoutes}</List>
-      <Divider />
-
-      {/* Logout Button */}
-      <MDBox p={2}>
-        <MDButton variant="contained" color="error" fullWidth onClick={onLogout}>
-          Déconnexion
-        </MDButton>
+        {/* Déconnexion */}
+        <MDBox p={2}>
+          <MDButton
+            color="error"
+            fullWidth
+            onClick={onLogout}
+            sx={{ borderRadius: "8px", padding: "10px" }}
+          >
+            Déconnexion
+          </MDButton>
+        </MDBox>
       </MDBox>
     </SidenavRoot>
   );
@@ -181,15 +156,32 @@ Sidenav.defaultProps = {
   brand: "",
 };
 
+// Validation des PropTypes
 Sidenav.propTypes = {
   user: PropTypes.shape({
-    name: PropTypes.string,
-    role: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
   }).isRequired,
-  onLogout: PropTypes.func.isRequired,
   brand: PropTypes.string,
   brandName: PropTypes.string.isRequired,
-  routes: PropTypes.arrayOf(PropTypes.object).isRequired,
+  routes: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.string,
+      roles: PropTypes.arrayOf(PropTypes.string),
+      children: PropTypes.arrayOf(
+        PropTypes.shape({
+          key: PropTypes.string.isRequired,
+          name: PropTypes.string.isRequired,
+          route: PropTypes.string.isRequired,
+          icon: PropTypes.string,
+          roles: PropTypes.arrayOf(PropTypes.string),
+        })
+      ),
+    })
+  ).isRequired,
+  onLogout: PropTypes.func.isRequired,
 };
 
 export default Sidenav;

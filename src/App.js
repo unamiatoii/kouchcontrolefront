@@ -7,7 +7,7 @@ import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import theme from "assets/theme";
 import themeDark from "assets/theme-dark";
-import routes from "routes";
+import routes from "routes"; // Ensure this contains routes with proper children
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logos/logo.jpeg";
 import brandDark from "assets/images/logos/logo.jpeg";
@@ -110,7 +110,6 @@ export default function App() {
 
       {isAuthenticated ? (
         <>
-          {/* Layout principal avec Sidenav */}
           {layout === "dashboard" && (
             <Sidenav
               color={sidenavColor}
@@ -133,7 +132,6 @@ export default function App() {
       ) : (
         <>
           <Routes>
-            {/* Routes non protégées */}
             <Route path="/" element={<SignIn />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

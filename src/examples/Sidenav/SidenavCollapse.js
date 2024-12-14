@@ -1,20 +1,5 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 
 // @mui material components
 import ListItem from "@mui/material/ListItem";
@@ -36,9 +21,15 @@ import {
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
-function SidenavCollapse({ icon, name, active, ...rest }) {
+function SidenavCollapse({ icon, name, route, active, ...rest }) {
   const [controller] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
+
+  // Utilisation de useLocation pour obtenir la route actuelle
+  const location = useLocation();
+
+  // Vérifie si la route est active
+  const isActive = location.pathname === route;
 
   return (
     <ListItem component="li">
@@ -46,7 +37,7 @@ function SidenavCollapse({ icon, name, active, ...rest }) {
         {...rest}
         sx={(theme) =>
           collapseItem(theme, {
-            active,
+            active: isActive || active, // Applique 'active' si c'est la route courante ou si 'active' est passé en props
             transparentSidenav,
             whiteSidenav,
             darkMode,
@@ -56,11 +47,11 @@ function SidenavCollapse({ icon, name, active, ...rest }) {
       >
         <ListItemIcon
           sx={(theme) =>
-            collapseIconBox(theme, { transparentSidenav, whiteSidenav, darkMode, active })
+            collapseIconBox(theme, { transparentSidenav, whiteSidenav, darkMode, active: isActive })
           }
         >
           {typeof icon === "string" ? (
-            <Icon sx={(theme) => collapseIcon(theme, { active })}>{icon}</Icon>
+            <Icon sx={(theme) => collapseIcon(theme, { active: isActive })}>{icon}</Icon>
           ) : (
             icon
           )}
@@ -73,7 +64,7 @@ function SidenavCollapse({ icon, name, active, ...rest }) {
               miniSidenav,
               transparentSidenav,
               whiteSidenav,
-              active,
+              active: isActive,
             })
           }
         />
@@ -91,6 +82,7 @@ SidenavCollapse.defaultProps = {
 SidenavCollapse.propTypes = {
   icon: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
+  route: PropTypes.string.isRequired, // Assurez-vous que la route est passée en prop
   active: PropTypes.bool,
 };
 
