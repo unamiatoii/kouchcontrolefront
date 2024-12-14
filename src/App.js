@@ -11,8 +11,8 @@ import themeDark from "assets/theme-dark";
 import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
-import brandWhite from "assets/images/logo-ct.png";
-import brandDark from "assets/images/logo-ct-dark.png";
+import brandWhite from "assets/images/logos/logo.jpeg";
+import brandDark from "assets/images/logos/logo.jpeg";
 import SignIn from "layouts/authentication/sign-in";
 import Chantiers from "pages/chantiers/ListChantiers"; // Assurez-vous que ce composant existe
 import Dashboard from "layouts/dashboard";
