@@ -25,6 +25,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
   },
   {
     type: "collapse",
@@ -32,6 +33,7 @@ const routes = [
     key: "stocks",
     icon: <Icon fontSize="small">inventory_2</Icon>,
     isOpen: false,
+    roles: ["administrateur", "fournisseur"],
     children: [
       {
         name: "Liste des articles",
@@ -39,6 +41,7 @@ const routes = [
         route: "/stocks/articles-list",
         component: <ArticlesList />,
         icon: <Icon fontSize="small">list</Icon>,
+        roles: ["administrateur", "caissiere", "fournisseur"],
       },
       {
         name: "Ajouter un article",
@@ -46,6 +49,7 @@ const routes = [
         route: "/stocks/add-article",
         component: <AddArticle />,
         icon: <Icon fontSize="small">add</Icon>,
+        roles: ["administrateur", "fournisseur"],
       },
       {
         name: "Transférer un article",
@@ -53,6 +57,7 @@ const routes = [
         route: "/stocks/transfer-article",
         component: <TransferArticle />,
         icon: <Icon fontSize="small">send</Icon>,
+        roles: ["administrateur", "fournisseur", "comptable"],
       },
     ],
   },
@@ -62,6 +67,7 @@ const routes = [
     key: "sites",
     icon: <Icon fontSize="small">engineering</Icon>,
     isOpen: false,
+    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
     children: [
       {
         name: "Liste des chantiers",
@@ -69,6 +75,7 @@ const routes = [
         route: "/sites/sites-list",
         component: <SitesList />,
         icon: <Icon fontSize="small">list_alt</Icon>,
+        roles: ["administrateur", "comptable"],
       },
       {
         name: "Planifications des besoins",
@@ -76,6 +83,7 @@ const routes = [
         route: "/sites/needs-planning",
         component: <NeedsPlanning />,
         icon: <Icon fontSize="small">event_note</Icon>,
+        roles: ["administrateur", "caissiere"],
       },
       {
         name: "Suivi des consommations",
@@ -83,6 +91,7 @@ const routes = [
         route: "/sites/consumption-tracking",
         component: <ConsumptionTracking />,
         icon: <Icon fontSize="small">bar_chart</Icon>,
+        roles: ["administrateur"],
       },
       {
         name: "Rapport journalier",
@@ -90,6 +99,7 @@ const routes = [
         route: "/sites/daily-report",
         component: <DailyReport />,
         icon: <Icon fontSize="small">description</Icon>,
+        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
       },
     ],
   },
@@ -99,6 +109,7 @@ const routes = [
     key: "warehouses",
     icon: <Icon fontSize="small">store</Icon>,
     isOpen: false,
+    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
     children: [
       {
         name: "Liste des entrepôts",
@@ -106,6 +117,7 @@ const routes = [
         route: "/warehouses/warehouses-list",
         component: <WarehousesList />,
         icon: <Icon fontSize="small">view_list</Icon>,
+        roles: ["administrateur", "comptable"],
       },
       {
         name: "Historique des transferts",
@@ -113,6 +125,7 @@ const routes = [
         route: "/warehouses/transfers-history",
         component: <TransfersHistory />,
         icon: <Icon fontSize="small">history</Icon>,
+        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
       },
     ],
   },
@@ -122,6 +135,7 @@ const routes = [
     key: "commercial",
     icon: <Icon fontSize="small">shopping_cart</Icon>,
     isOpen: false,
+    roles: ["administrateur", "fournisseur"],
     children: [
       {
         name: "Enregistrer une commande",
@@ -129,6 +143,7 @@ const routes = [
         route: "/commercial/register-order",
         component: <RegisterOrder />,
         icon: <Icon fontSize="small">add_shopping_cart</Icon>,
+        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
       },
       {
         name: "Liste des commandes",
@@ -136,6 +151,7 @@ const routes = [
         route: "/commercial/orders-list",
         component: <OrdersList />,
         icon: <Icon fontSize="small">receipt</Icon>,
+        roles: ["administrateur", "caissiere"],
       },
       {
         name: "Devis",
@@ -143,6 +159,7 @@ const routes = [
         route: "/commercial/quotations",
         component: <Quotations />,
         icon: <Icon fontSize="small">request_quote</Icon>,
+        roles: ["administrateur", "comptable"],
       },
     ],
   },
@@ -152,6 +169,7 @@ const routes = [
     key: "admin",
     icon: <Icon fontSize="small">admin_panel_settings</Icon>,
     isOpen: false,
+    roles: ["administrateur"],
     children: [
       {
         name: "Liste des utilisateurs",
@@ -159,6 +177,7 @@ const routes = [
         route: "/admin/users-list",
         component: <UsersList />,
         icon: <Icon fontSize="small">group</Icon>,
+        roles: ["administrateur", "comptable"],
       },
       {
         name: "Configurations alertes/Seuil",
@@ -166,6 +185,7 @@ const routes = [
         route: "/admin/alert-settings",
         component: <AlertSettings />,
         icon: <Icon fontSize="small">settings</Icon>,
+        roles: ["administrateur"],
       },
     ],
   },

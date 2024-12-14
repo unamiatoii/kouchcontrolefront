@@ -7,17 +7,21 @@ import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import theme from "assets/theme";
 import themeDark from "assets/theme-dark";
-
 import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
-
 import brandWhite from "assets/images/logos/logo.jpeg";
 import brandDark from "assets/images/logos/logo.jpeg";
 import SignIn from "layouts/authentication/sign-in";
-import Chantiers from "pages/chantiers/ListChantiers"; // Assurez-vous que ce composant existe
 import Dashboard from "layouts/dashboard";
+import { useSelector, useDispatch } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import { logoutUser } from "./domain/authSlice";
+
 export default function App() {
-  const [controller, dispatch] = useMaterialUIController();
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  const [controller, materialDispatch] = useMaterialUIController();
   const {
     miniSidenav,
     layout,
@@ -27,29 +31,35 @@ export default function App() {
     whiteSidenav,
     darkMode,
   } = controller;
+
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const { pathname } = useLocation();
 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+  }, [pathname]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    localStorage.clear();
+  };
+
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
-      setMiniSidenav(dispatch, false);
+      setMiniSidenav(materialDispatch, false);
       setOnMouseEnter(true);
     }
   };
 
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
-      setMiniSidenav(dispatch, true);
+      setMiniSidenav(materialDispatch, true);
       setOnMouseEnter(false);
     }
   };
 
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
-
-  useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-  }, [pathname]);
+  const handleConfiguratorOpen = () => setOpenConfigurator(materialDispatch, !openConfigurator);
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -96,25 +106,39 @@ export default function App() {
   return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      {layout === "dashboard" && (
+      <ToastContainer />
+
+      {isAuthenticated ? (
         <>
-          <Sidenav
-            color={sidenavColor}
-            brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="KOUCHCONTROL"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
+          {/* Layout principal avec Sidenav */}
+          {layout === "dashboard" && (
+            <Sidenav
+              color={sidenavColor}
+              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+              brandName="KOUCHCONTROL"
+              routes={routes}
+              onMouseEnter={handleOnMouseEnter}
+              onMouseLeave={handleOnMouseLeave}
+              user={user}
+              onLogout={handleLogout}
+            />
+          )}
           {configsButton}
+          <Routes>
+            {getRoutes(routes)}
+            <Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </>
+      ) : (
+        <>
+          <Routes>
+            {/* Routes non protégées */}
+            <Route path="/" element={<SignIn />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
         </>
       )}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="/" element={<SignIn />} />
-        <Route path="*" element={<Navigate to="/" replace />} />{" "}
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
     </ThemeProvider>
   );
 }
