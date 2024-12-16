@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Modal, Box, TextField, Button, Typography, InputAdornment } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import MDButtonSpinner from "components/MDButtonSpinner.js";
+import { useDispatch } from "react-redux";
+import { updateUser } from "domain/userSlice"; // Assuming updateUser is an action
 
 function EditUserModal({ open, onClose, user, onSave }) {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     setFormData({
@@ -23,9 +28,25 @@ function EditUserModal({ open, onClose, user, onSave }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Ensure we pass the user ID along with the updates
+      const userId = user?.id; // Get user ID from the user prop
+      if (!userId) {
+        throw new Error("User ID is required for updating the user");
+      }
+
+      // Dispatch the updateUser action with both ID and updates
+      await dispatch(updateUser({ id: userId, updates: formData }));
+
+      onSave(formData); // Optional: callback to parent for further handling
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error("Failed to update user:", error.message);
+    } finally {
+      setLoading(false); // Set loading to false after the process ends
+    }
   };
 
   return (
@@ -79,7 +100,12 @@ function EditUserModal({ open, onClose, user, onSave }) {
           <Button onClick={onClose} variant="error" color="error">
             Annuler
           </Button>
-          <MDButtonSpinner onClick={handleSave} variant="contained" color="success">
+          <MDButtonSpinner
+            onClick={handleSave}
+            variant="contained"
+            color="success"
+            loading={loading}
+          >
             Modifier
           </MDButtonSpinner>
         </Box>
@@ -92,6 +118,7 @@ EditUserModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   user: PropTypes.shape({
+    id: PropTypes.string.isRequired, // Ensure the user has an 'id'
     name: PropTypes.string,
     email: PropTypes.string,
   }),
