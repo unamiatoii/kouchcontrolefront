@@ -10,13 +10,9 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "examples/Tables/DataTable";
+import DataTable from "./component/userTable";
 
-// Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
 function ListeUsers() {
-  const { columns, rows } = authorsTableData();
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -35,17 +31,11 @@ function ListeUsers() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Authors Table
+                  Liste des utilisateurs
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                <DataTable />
               </MDBox>
             </Card>
           </Grid>
