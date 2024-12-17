@@ -25,7 +25,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
   },
   {
     type: "collapse",
@@ -33,7 +33,7 @@ const routes = [
     key: "stocks",
     icon: <Icon fontSize="small">inventory_2</Icon>,
     isOpen: false,
-    roles: ["administrateur", "fournisseur"],
+    roles: ["administrateur", "gestionnaire"],
     children: [
       {
         name: "Liste des articles",
@@ -41,7 +41,7 @@ const routes = [
         route: "/stocks/articles-list",
         component: <ArticlesList />,
         icon: <Icon fontSize="small">list</Icon>,
-        roles: ["administrateur", "caissiere", "fournisseur"],
+        roles: ["administrateur", "chef", "gestionnaire"],
       },
       {
         name: "Ajouter un article",
@@ -49,7 +49,7 @@ const routes = [
         route: "/stocks/add-article",
         component: <AddArticle />,
         icon: <Icon fontSize="small">add</Icon>,
-        roles: ["administrateur", "fournisseur"],
+        roles: ["administrateur", "gestionnaire"],
       },
       {
         name: "Transférer un article",
@@ -57,7 +57,7 @@ const routes = [
         route: "/stocks/transfer-article",
         component: <TransferArticle />,
         icon: <Icon fontSize="small">send</Icon>,
-        roles: ["administrateur", "fournisseur", "comptable"],
+        roles: ["administrateur", "gestionnaire", "commercial"],
       },
     ],
   },
@@ -67,7 +67,7 @@ const routes = [
     key: "sites",
     icon: <Icon fontSize="small">engineering</Icon>,
     isOpen: false,
-    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
     children: [
       {
         name: "Liste des chantiers",
@@ -75,7 +75,7 @@ const routes = [
         route: "/sites/sites-list",
         component: <SitesList />,
         icon: <Icon fontSize="small">list_alt</Icon>,
-        roles: ["administrateur", "comptable"],
+        roles: ["administrateur", "commercial"],
       },
       {
         name: "Planifications des besoins",
@@ -83,7 +83,7 @@ const routes = [
         route: "/sites/needs-planning",
         component: <NeedsPlanning />,
         icon: <Icon fontSize="small">event_note</Icon>,
-        roles: ["administrateur", "caissiere"],
+        roles: ["administrateur", "chef"],
       },
       {
         name: "Suivi des consommations",
@@ -99,7 +99,7 @@ const routes = [
         route: "/sites/daily-report",
         component: <DailyReport />,
         icon: <Icon fontSize="small">description</Icon>,
-        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+        roles: ["administrateur", "chef", "gestionnaire", "commercial"],
       },
     ],
   },
@@ -109,7 +109,7 @@ const routes = [
     key: "warehouses",
     icon: <Icon fontSize="small">store</Icon>,
     isOpen: false,
-    roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
     children: [
       {
         name: "Liste des entrepôts",
@@ -117,7 +117,7 @@ const routes = [
         route: "/warehouses/warehouses-list",
         component: <WarehousesList />,
         icon: <Icon fontSize="small">view_list</Icon>,
-        roles: ["administrateur", "comptable"],
+        roles: ["administrateur", "commercial"],
       },
       {
         name: "Historique des transferts",
@@ -125,7 +125,7 @@ const routes = [
         route: "/warehouses/transfers-history",
         component: <TransfersHistory />,
         icon: <Icon fontSize="small">history</Icon>,
-        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+        roles: ["administrateur", "chef", "gestionnaire", "commercial"],
       },
     ],
   },
@@ -135,7 +135,7 @@ const routes = [
     key: "commercial",
     icon: <Icon fontSize="small">shopping_cart</Icon>,
     isOpen: false,
-    roles: ["administrateur", "fournisseur"],
+    roles: ["administrateur", "gestionnaire"],
     children: [
       {
         name: "Enregistrer une commande",
@@ -143,7 +143,7 @@ const routes = [
         route: "/commercial/register-order",
         component: <RegisterOrder />,
         icon: <Icon fontSize="small">add_shopping_cart</Icon>,
-        roles: ["administrateur", "caissiere", "fournisseur", "comptable"],
+        roles: ["administrateur", "chef", "gestionnaire", "commercial"],
       },
       {
         name: "Liste des commandes",
@@ -151,7 +151,7 @@ const routes = [
         route: "/commercial/orders-list",
         component: <OrdersList />,
         icon: <Icon fontSize="small">receipt</Icon>,
-        roles: ["administrateur", "caissiere"],
+        roles: ["administrateur", "chef"],
       },
       {
         name: "Devis",
@@ -159,7 +159,7 @@ const routes = [
         route: "/commercial/quotations",
         component: <Quotations />,
         icon: <Icon fontSize="small">request_quote</Icon>,
-        roles: ["administrateur", "comptable"],
+        roles: ["administrateur", "commercial"],
       },
     ],
   },
@@ -177,7 +177,7 @@ const routes = [
         route: "/admin/users-list",
         component: <UsersList />,
         icon: <Icon fontSize="small">group</Icon>,
-        roles: ["administrateur", "comptable"],
+        roles: ["administrateur", "commercial"],
       },
       {
         name: "Configurations alertes/Seuil",
