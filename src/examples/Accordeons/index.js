@@ -25,7 +25,7 @@ function AccordionMenu({ menuKey, name, icon, collapseName, children }) {
         }}
         onClick={toggleMenu}
       >
-        <SidenavCollapse name={name} icon={icon} active={menuKey === collapseName} />
+        <SidenavCollapse name={name} icon={icon} />
       </div>
 
       {/* Sous-menus affichés si l'accordéon est ouvert */}
