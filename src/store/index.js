@@ -4,7 +4,9 @@ import storage from "redux-persist/lib/storage";
 import { createFilter } from "redux-persist-transform-filter";
 import authReducer from "../domain/authSlice";
 import userReducer from "../domain/userSlice";
+import roleReducer from "../domain/roleSlice"; // Import roleReducer
 
+// Persist configuration for auth and user slices
 const authFilter = createFilter("auth", ["token", "user"]);
 const authPersistConfig = {
   key: "auth",
@@ -17,19 +19,20 @@ const userPersistConfig = {
   storage,
 };
 
-// Application des configurations de persistance aux reducers
+// Applying persist configurations to reducers
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 
-// Création du store
+// Create the store with all reducers, excluding role from persistence
 const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     users: persistedUserReducer,
+    roles: roleReducer,
   },
 });
 
-// Création du persistor
+// Create the persistor
 const persistor = persistStore(store);
 
 export { store, persistor };

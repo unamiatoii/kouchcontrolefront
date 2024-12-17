@@ -7,7 +7,7 @@ import MDBox from "components/MDBox";
 import DataTableHeadCell from "./DataTableHeadCell";
 import DataTableBodyCell from "./DataTableBodyCell";
 import { fetchUsers } from "domain/userSlice";
-import EditUserModal from "../component/userModal";
+import EditUserModal from "../component/updateUserModal";
 
 function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
   const dispatch = useDispatch();
