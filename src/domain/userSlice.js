@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "./../data/axiosConfig";
+import { toast } from "react-toastify";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
@@ -33,9 +34,18 @@ export const addUser = createAsyncThunk("users/addUser", async (user, { rejectWi
 // Modifier un utilisateur
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async ({ id, updates }, { rejectWithValue }) => {
+  async ({ id, updates }, { dispatch, getState, rejectWithValue }) => {
     try {
-      const response = await api.put(`/users/${id}`, updates); // Utilisation de `api` pour mettre à jour un utilisateur
+      const { auth } = getState();
+      const token = auth?.token;
+
+      const response = await api.put(`/users/${id}`, updates, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success("Utilisateur modifié avec succès!");
+      dispatch(fetchUsers());
       return response.data; // L'utilisateur mis à jour
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -82,9 +92,10 @@ const userSlice = createSlice({
       })
       // Gestion de updateUser
       .addCase(updateUser.fulfilled, (state, action) => {
-        const index = state.users.findIndex((user) => user.id === action.payload.id);
+        const index = state.users.data.findIndex((user) => user.id === action.payload.id);
         if (index !== -1) {
           state.users[index] = action.payload;
+          fetchUsers();
         }
       })
       // Gestion de deleteUser

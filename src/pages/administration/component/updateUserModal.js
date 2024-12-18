@@ -6,6 +6,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import MDButtonSpinner from "components/MDButtonSpinner.js";
 import { useDispatch } from "react-redux";
 import { updateUser } from "domain/userSlice"; // Assuming updateUser is an action
+import { fetchUsers } from "domain/userSlice";
 
 function EditUserModal({ open, onClose, user, onSave }) {
   const [formData, setFormData] = useState({
@@ -39,6 +40,8 @@ function EditUserModal({ open, onClose, user, onSave }) {
 
       // Dispatch the updateUser action with both ID and updates
       await dispatch(updateUser({ id: userId, updates: formData }));
+      // Dispatch the updateUser action with both ID and updates
+      await dispatch(fetchUsers);
 
       onSave(formData); // Optional: callback to parent for further handling
       onClose(); // Close the modal
