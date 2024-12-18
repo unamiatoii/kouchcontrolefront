@@ -9,7 +9,7 @@ export const fetchUsers = createAsyncThunk(
       const { auth } = getState();
       const token = auth?.token;
 
-      const response = await api.get("/users", {
+      const response = await api.get("users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -22,23 +22,30 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-export const addUser = createAsyncThunk("users/addUser", async (user, { rejectWithValue }) => {
-  try {
-    const response = await api.post("/users", user);
-    return response.data; // L'utilisateur ajouté
-  } catch (error) {
-    return rejectWithValue(error.response?.data || error.message);
+export const addUser = createAsyncThunk(
+  "users/addUser",
+  async (user, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const { auth } = getState();
+      const token = auth?.token;
+      const response = await api.post("users", user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch(fetchUsers());
+      return response.data; // L'utilisateur ajouté
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-});
+);
 
 // Modifier un utilisateur
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ id, updates }, { dispatch, getState, rejectWithValue }) => {
     try {
-      const { auth } = getState();
-      const token = auth?.token;
-
       const response = await api.put(`/users/${id}`, updates, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,7 +95,7 @@ const userSlice = createSlice({
       })
       // Gestion de addUser
       .addCase(addUser.fulfilled, (state, action) => {
-        state.users.push(action.payload);
+        state.users.data.push(action.payload);
       })
       // Gestion de updateUser
       .addCase(updateUser.fulfilled, (state, action) => {
