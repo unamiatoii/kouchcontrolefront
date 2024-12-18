@@ -5,7 +5,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import MDButtonSpinner from "components/MDButtonSpinner.js";
 import { useDispatch } from "react-redux";
-import { updateUser } from "domain/userSlice"; // Assuming updateUser is an action
+import { updateUser } from "domain/userSlice";
+import { fetchUsers } from "domain/userSlice";
 
 function EditUserModal({ open, onClose, user, onSave }) {
   const [formData, setFormData] = useState({
@@ -39,6 +40,8 @@ function EditUserModal({ open, onClose, user, onSave }) {
 
       // Dispatch the updateUser action with both ID and updates
       await dispatch(updateUser({ id: userId, updates: formData }));
+      // Dispatch the updateUser action with both ID and updates
+      await dispatch(fetchUsers);
 
       onSave(formData); // Optional: callback to parent for further handling
       onClose(); // Close the modal
@@ -100,14 +103,16 @@ function EditUserModal({ open, onClose, user, onSave }) {
           <Button onClick={onClose} variant="error" color="error">
             Annuler
           </Button>
-          <MDButtonSpinner
-            onClick={handleSave}
-            variant="contained"
-            color="success"
-            loading={loading}
-          >
-            Modifier
-          </MDButtonSpinner>
+          <Box display="flex" justifyContent="space-between" sx={{ width: "40%" }}>
+            <MDButtonSpinner
+              onClick={handleSave}
+              variant="contained"
+              color="success"
+              loading={loading}
+            >
+              Modifier
+            </MDButtonSpinner>
+          </Box>
         </Box>
       </Box>
     </Modal>

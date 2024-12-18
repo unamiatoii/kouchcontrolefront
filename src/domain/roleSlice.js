@@ -20,7 +20,6 @@ export const fetchRoles = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
