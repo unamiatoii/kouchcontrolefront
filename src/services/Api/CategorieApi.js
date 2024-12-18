@@ -1,12 +1,14 @@
 import axios from "axios";
 
+// Configuration de l'instance Axios
 const API_URL = axios.create({
-  baseURL: "https://kouchcontrol.digitalbox.ci/api/articles",
+  baseURL: "https://kouchcontrol.digitalbox.ci/api/categories",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Fonction pour vérifier si le token existe dans le localStorage
 const getToken = () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -14,10 +16,10 @@ const getToken = () => {
   }
   return token;
 };
-
 API_URL.interceptors.request.use(
   (config) => {
     const token = getToken();
+    console.log("Token dans la requête :", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
@@ -32,70 +34,66 @@ API_URL.interceptors.request.use(
   }
 );
 
-// Fonction pour récupérer tous les articles
-export const getArticles = async () => {
+// Fonction pour récupérer toutes les catégories
+export const getCategories = async () => {
   try {
     const response = await API_URL.get("/");
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la récupération des articles :",
+      "Erreur lors de la récupération des catégories :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour récupérer un article par ID
-export const getArticleById = async (id) => {
+export const getCategoryById = async (id) => {
   try {
     const response = await API_URL.get(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la récupération de l'article avec ID ${id}:`,
+      `Erreur lors de la récupération de la catégorie avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour créer un nouvel article
-export const createArticle = async (data) => {
+export const createCategory = async (data) => {
   try {
     const response = await API_URL.post("/", data);
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la création d'un article :",
+      "Erreur lors de la création d'une catégorie :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour mettre à jour un article existant
-export const updateArticle = async (id, data) => {
+export const updateCategory = async (id, data) => {
   try {
     const response = await API_URL.put(`/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la mise à jour de l'article avec ID ${id}:`,
+      `Erreur lors de la mise à jour de la catégorie avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour supprimer un article
-export const deleteArticle = async (id) => {
+export const deleteCategory = async (id) => {
   try {
     const response = await API_URL.delete(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la suppression de l'article avec ID ${id}:`,
+      `Erreur lors de la suppression de la catégorie avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;

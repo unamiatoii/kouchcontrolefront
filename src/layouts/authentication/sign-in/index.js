@@ -35,6 +35,12 @@ function Basic() {
       const result = await dispatch(loginUser({ email, password }));
 
       if (result.meta.requestStatus === "fulfilled") {
+        // After successful login, store the token in localStorage
+        const { token } = result.payload; // Assuming token is returned in the response
+        if (token) {
+          localStorage.setItem("token", token); // Store the token in localStorage
+        }
+
         toast.success("Connexion réussie! Bienvenue.");
         navigate("/dashboard");
       } else {
