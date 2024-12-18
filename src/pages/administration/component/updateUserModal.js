@@ -103,14 +103,16 @@ function EditUserModal({ open, onClose, user, onSave }) {
           <Button onClick={onClose} variant="error" color="error">
             Annuler
           </Button>
-          <MDButtonSpinner
-            onClick={handleSave}
-            variant="contained"
-            color="success"
-            loading={loading}
-          >
-            Modifier
-          </MDButtonSpinner>
+          <Box display="flex" justifyContent="space-between" sx={{ width: "40%" }}>
+            <MDButtonSpinner
+              onClick={handleSave}
+              variant="contained"
+              color="success"
+              loading={loading}
+            >
+              Modifier
+            </MDButtonSpinner>
+          </Box>
         </Box>
       </Box>
     </Modal>

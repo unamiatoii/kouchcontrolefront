@@ -16,19 +16,12 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
 
   const [localUsers, setLocalUsers] = useState([]);
 
-  // Fetch users on mount
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchUsers());
     }
   }, [dispatch, status]);
 
-  // Debug logs for rawUsers
-  useEffect(() => {
-    console.log("rawUsers current state:", rawUsers);
-  }, [rawUsers]);
-
-  // Process and validate rawUsers when it changes
   useEffect(() => {
     if (rawUsers && Array.isArray(rawUsers.data)) {
       const formattedUsers = rawUsers.data.map((user) => ({
@@ -36,12 +29,12 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
         firstName: user.name?.split(" ")[0] || "N/A",
         email: user.email || "N/A",
         role: user.role_id || "Inconnu",
-        originalUser: user, // Save the full user object for editing
+        originalUser: user,
       }));
       setLocalUsers(formattedUsers);
     } else {
       console.warn("Invalid rawUsers format:", rawUsers);
-      setLocalUsers([]); // Fallback to empty array
+      setLocalUsers([]);
     }
   }, [rawUsers]);
 
@@ -53,8 +46,7 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
     setOpen(true);
   };
 
-  const handleSave = (updatedUser) => {
-    console.log("Utilisateur modifié :", updatedUser);
+  const handleSave = () => {
     setOpen(false);
   };
 

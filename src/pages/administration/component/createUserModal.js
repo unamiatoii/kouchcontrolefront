@@ -20,7 +20,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../../../domain/userSlice";
 import { fetchRoles } from "../../../domain/roleSlice";
-import { Password, Person } from "@mui/icons-material";
+import { Password, Person, Plumbing, Settings } from "@mui/icons-material";
 
 function CreateUserModal({ open, onClose }) {
   const [newUser, setNewUser] = useState({ name: "", email: "", role_id: "", password: "" });
@@ -143,7 +143,18 @@ function CreateUserModal({ open, onClose }) {
                 }}
               />
               <FormControl sx={{ width: "30%", height: "auto" }} margin="normal">
-                <InputLabel id="role-select-label">Rôle</InputLabel>
+                <InputLabel
+                  id="role-select-label"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Settings color="primary" />
+                      </InputAdornment>
+                    ),
+                  }}
+                >
+                  Rôle
+                </InputLabel>
                 <Select
                   sx={{ height: "100%" }}
                   labelId="role-select-label"
@@ -169,18 +180,31 @@ function CreateUserModal({ open, onClose }) {
               </FormControl>
             </Box>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose} variant="outlined" color="error">
+          <DialogActions
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Button
+              onClick={onClose}
+              variant="outlined"
+              color="secondary"
+              sx={{
+                backgroundColor: "orange",
+              }}
+            >
               Annuler
             </Button>
             <Button
+              sx={{ color: "white" }}
               onClick={handleCreateUser}
               variant="contained"
               color="primary"
               disabled={isSubmitting}
               startIcon={isSubmitting && <CircularProgress size={20} />}
             >
-              {isSubmitting ? "Création en cours..." : "Créer"}
+              {isSubmitting ? "En cours..." : "Créer"}
             </Button>
           </DialogActions>
         </Dialog>

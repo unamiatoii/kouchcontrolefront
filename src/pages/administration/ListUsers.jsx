@@ -17,6 +17,7 @@ import DataTable from "./component/userTable";
 
 // CreateUserModal import
 import CreateUserModal from "./component/createUserModal";
+import { AddBox, AddCircle, AddPhotoAlternateSharp } from "@mui/icons-material";
 
 function ListeUsers() {
   const [openModal, setOpenModal] = useState(false);
@@ -48,7 +49,7 @@ function ListeUsers() {
                   Liste des utilisateurs
                 </MDTypography>
                 <IconButton color="primary" onClick={handleOpenModal}>
-                  <AddIcon />
+                  <AddCircle color="secondary" />
                 </IconButton>
               </MDBox>
               <MDBox pt={3}>
