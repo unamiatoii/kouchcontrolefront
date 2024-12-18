@@ -8,35 +8,43 @@ import DataTableHeadCell from "./DataTableHeadCell";
 import DataTableBodyCell from "./DataTableBodyCell";
 import { fetchUsers } from "domain/userSlice";
 import EditUserModal from "../component/updateUserModal";
+import { capitalize } from "utils/stringOperation";
 
 function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
   const dispatch = useDispatch();
+
+  // Sélecteurs Redux
   const rawUsers = useSelector((state) => state.users.users);
-  const status = useSelector((state) => state.users.status);
+  const roles = useSelector((state) => state.roles.roles);
+  const usersStatus = useSelector((state) => state.users.status);
+  const rolesStatus = useSelector((state) => state.roles.status);
 
   const [localUsers, setLocalUsers] = useState([]);
 
+  // Charger les utilisateurs au montage
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchUsers());
-    }
-  }, [dispatch, status]);
+    if (usersStatus === "idle") dispatch(fetchUsers());
+  }, [dispatch, usersStatus]);
 
+  // Formater les utilisateurs avec libellé du rôle
   useEffect(() => {
-    if (rawUsers && Array.isArray(rawUsers.data)) {
-      const formattedUsers = rawUsers.data.map((user) => ({
-        lastName: user.name?.split(" ")[1] || "N/A",
-        firstName: user.name?.split(" ")[0] || "N/A",
-        email: user.email || "N/A",
-        role: user.role_id || "Inconnu",
-        originalUser: user,
-      }));
+    if (rawUsers && Array.isArray(rawUsers.data) && roles.length > 0) {
+      const formattedUsers = rawUsers.data.map((user) => {
+        const roleLabel = capitalize(
+          roles.find((role) => role.id === user.role_id)?.name || "Inconnu"
+        );
+
+        return {
+          lastName: capitalize(user.name?.split(" ")[1] || "N/A"),
+          firstName: capitalize(user.name?.split(" ")[0] || "N/A"),
+          email: user.email?.toLowerCase() || "N/A", // Email en minuscules
+          role: roleLabel,
+          originalUser: user,
+        };
+      });
       setLocalUsers(formattedUsers);
-    } else {
-      console.warn("Invalid rawUsers format:", rawUsers);
-      setLocalUsers([]);
     }
-  }, [rawUsers]);
+  }, [rawUsers, roles]);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [open, setOpen] = useState(false);
@@ -46,9 +54,7 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
     setOpen(true);
   };
 
-  const handleSave = () => {
-    setOpen(false);
-  };
+  const handleSave = () => setOpen(false);
 
   const columns = useMemo(
     () => [
@@ -61,19 +67,21 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
     []
   );
 
-  const data = useMemo(() => {
-    return localUsers.map((user) => ({
-      ...user,
-      edit: (
-        <Icon
-          sx={{ cursor: "pointer", color: "info.main" }}
-          onClick={() => handleEdit(user.originalUser)}
-        >
-          edit
-        </Icon>
-      ),
-    }));
-  }, [localUsers]);
+  const data = useMemo(
+    () =>
+      localUsers.map((user) => ({
+        ...user,
+        edit: (
+          <Icon
+            sx={{ cursor: "pointer", color: "info.main" }}
+            onClick={() => handleEdit(user.originalUser)}
+          >
+            edit
+          </Icon>
+        ),
+      })),
+    [localUsers]
+  );
 
   const tableInstance = useTable(
     { columns, data, initialState: { pageIndex: 0 } },
@@ -84,9 +92,11 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
 
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } = tableInstance;
 
+  const isLoading = usersStatus === "loading" || rolesStatus === "loading";
+
   return (
     <>
-      {status === "loading" ? (
+      {isLoading ? (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           <CircularProgress />
         </div>
