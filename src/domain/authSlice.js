@@ -14,6 +14,25 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Fonction pour la connexion
+export const logout = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { auth } = getState();
+      const token = auth?.token;
+      const response = await api.post("/logout", null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Une erreur s'est produite");
+    }
+  }
+);
+
 // Slice pour la gestion de l'authentification
 const authSlice = createSlice({
   name: "auth",
