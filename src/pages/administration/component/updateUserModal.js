@@ -5,7 +5,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import MDButtonSpinner from "components/MDButtonSpinner.js";
 import { useDispatch } from "react-redux";
-import { updateUser } from "domain/userSlice"; // Assuming updateUser is an action
+import { updateUser } from "domain/userSlice";
 import { fetchUsers } from "domain/userSlice";
 
 function EditUserModal({ open, onClose, user, onSave }) {

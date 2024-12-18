@@ -46,6 +46,8 @@ export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ id, updates }, { dispatch, getState, rejectWithValue }) => {
     try {
+      const { auth } = getState();
+      const token = auth?.token;
       const response = await api.put(`/users/${id}`, updates, {
         headers: {
           Authorization: `Bearer ${token}`,
