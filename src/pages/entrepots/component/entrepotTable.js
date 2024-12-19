@@ -6,52 +6,40 @@ import { Table, TableBody, TableContainer, TableRow, Icon, CircularProgress } fr
 import MDBox from "components/MDBox";
 import DataTableHeadCell from "./DataTableHeadCell";
 import DataTableBodyCell from "./DataTableBodyCell";
-import { fetchUsers } from "domain/userSlice";
-import EditUserModal from "../component/updateUserModal";
-import { fetchRoles } from "domain/roleSlice";
+import { fetchEntrepots } from "domain/entrepotSlice";
+import EditEntrepotModal from "../component/updateEntrepotModal";
 
 function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
   const dispatch = useDispatch();
 
   // Sélecteurs Redux
-  const rawUsers = useSelector((state) => state.users.users);
-  const roles = useSelector((state) => state.roles.roles);
-  const status = useSelector((state) => state.users.status);
+  const { entrepots = [], status = "idle" } = useSelector((state) => state.entrepots || {});
 
-  const [localUsers, setLocalUsers] = useState([]);
+  const [localEntrepots, setLocalEntrepots] = useState([]);
 
-  // Charger les utilisateurs au montage
+  // Charger les entrepôts au montage
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchUsers());
-      dispatch(fetchRoles());
+      dispatch(fetchEntrepots());
     }
   }, [dispatch, status]);
 
-  // Formater les utilisateurs avec libellé du rôle
+  // Formater les entrepôts
   useEffect(() => {
-    if (rawUsers && Array.isArray(rawUsers.data)) {
-      const formattedUsers = rawUsers.data.map((user) => {
-        const roleLabel = roles.find((role) => role.id === user.role_id)?.name || "Inconnu";
-        return {
-          lastName: user.name?.split(" ")[1] || "N/A",
-          firstName: user.name?.split(" ")[0] || "N/A",
-          email: user.email || "N/A",
-          role: roleLabel, // Utiliser le libellé
-          originalUser: user,
-        };
-      });
-      setLocalUsers(formattedUsers);
-    } else {
-      setLocalUsers([]);
-    }
-  }, [rawUsers, roles]);
+    const formattedEntrepots = entrepots.map((entrepot) => ({
+      name: entrepot.name || "N/A",
+      location: entrepot.location || "N/A",
+      capacity: entrepot.capacity || "N/A",
+      originalEntrepot: entrepot,
+    }));
+    setLocalEntrepots(formattedEntrepots);
+  }, [entrepots]);
 
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedEntrepot, setSelectedEntrepot] = useState(null);
   const [open, setOpen] = useState(false);
 
-  const handleEdit = (user) => {
-    setSelectedUser(user);
+  const handleEdit = (entrepot) => {
+    setSelectedEntrepot(entrepot);
     setOpen(true);
   };
 
@@ -61,28 +49,29 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
 
   const columns = useMemo(
     () => [
-      { Header: "Nom", accessor: "lastName", width: "20%" },
-      { Header: "Prénom", accessor: "firstName", width: "20%" },
-      { Header: "Email", accessor: "email", width: "30%" },
-      { Header: "Rôle", accessor: "role", width: "20%" },
+      { Header: "Nom", accessor: "name", width: "30%" },
+      { Header: "Localisation", accessor: "location", width: "40%" },
+      { Header: "Capacité", accessor: "capacity", width: "20%" },
       { Header: "Editer", accessor: "edit", width: "10%" },
     ],
     []
   );
 
-  const data = useMemo(() => {
-    return localUsers.map((user) => ({
-      ...user,
-      edit: (
-        <Icon
-          sx={{ cursor: "pointer", color: "info.main" }}
-          onClick={() => handleEdit(user.originalUser)}
-        >
-          edit
-        </Icon>
-      ),
-    }));
-  }, [localUsers]);
+  const data = useMemo(
+    () =>
+      localEntrepots.map((entrepot) => ({
+        ...entrepot,
+        edit: (
+          <Icon
+            sx={{ cursor: "pointer", color: "info.main" }}
+            onClick={() => handleEdit(entrepot.originalEntrepot)}
+          >
+            edit
+          </Icon>
+        ),
+      })),
+    [localEntrepots]
+  );
 
   const tableInstance = useTable(
     { columns, data, initialState: { pageIndex: 0 } },
@@ -99,7 +88,7 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           <CircularProgress />
         </div>
-      ) : localUsers.length > 0 ? (
+      ) : localEntrepots.length > 0 ? (
         <TableContainer sx={{ boxShadow: "none" }}>
           <Table {...getTableProps()}>
             <MDBox component="thead">
@@ -139,13 +128,13 @@ function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
         </TableContainer>
       ) : (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-          <p>Aucune donnée disponible ou problème de chargement des utilisateurs.</p>
+          <p>Aucune donnée disponible ou problème de chargement des entrepôts.</p>
         </div>
       )}
-      <EditUserModal
+      <EditEntrepotModal
         open={open}
         onClose={() => setOpen(false)}
-        user={selectedUser}
+        entrepot={selectedEntrepot}
         onSave={handleSave}
       />
     </>
