@@ -11,7 +11,7 @@ const ConfirmationModal = ({ article, handleDelete, closeModal }) => {
       aria-hidden={!article}
       style={{ display: "block", opacity: 1 }}
     >
-      <div className="modal-dialog">
+      <div className="modal-dialog" style={{ maxWidth: "1140px" }}>
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title" id="confirmationModalLabel">

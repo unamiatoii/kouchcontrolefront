@@ -74,24 +74,22 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
       id="articleModal"
       tabIndex="-1"
       aria-labelledby="articleModalLabel"
-      aria-hidden={!article}
-      style={{ display: "block", opacity: 1 }}
+      aria-hidden="false"
+      style={{
+        display: "block",
+        backgroundColor: "rgba(0, 0, 0, 0.5)", // Fond semi-transparent
+        animation: "fadeIn 0.3s ease-in-out", // Animation d'apparition
+      }}
     >
-      <div className="modal-dialog">
-        <div className="modal-content">
+      <div
+        className="modal-dialog modal-dialog-centered"
+        style={{
+          maxWidth: "50%", // Largeur personnalisée
+          animation: "scaleIn 0.3s ease-in-out", // Animation de mise à l'échelle
+        }}
+      >
+        <div className="modal-content" style={{ borderRadius: "15px" }}>
           <form onSubmit={handleSubmit}>
-            <div className="modal-header">
-              <h5 className="modal-title" id="articleModalLabel">
-                {article ? "Modifier l'Article" : "Ajouter un Article"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={closeModal}
-              ></button>
-            </div>
             <div className="modal-body">
               <div className="mb-3">
                 <label className="form-label">Nom de l article</label>
