@@ -17,19 +17,26 @@ const authPersistConfig = {
 
 const userPersistConfig = {
   key: "users",
-  storage: storageSession, // Correction ici
+  storage: storageSession,
+};
+
+const rolePersistConfig = {
+  key: "role",
+  storage: storageSession,
 };
 
 // Applying persist configurations to reducers
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 
+const persistedRoleReducer = persistReducer(rolePersistConfig, roleReducer);
+
 // Create the store with all reducers, excluding role from persistence
 const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     users: persistedUserReducer,
-    roles: roleReducer, // Non persisté
+    roles: persistedRoleReducer,
   },
 });
 

@@ -1,6 +1,9 @@
+import React, { useState } from "react";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -10,12 +13,17 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "examples/Tables/DataTable";
+import DataTable from "./component/userTable";
 
-// Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-function ListEntrepots() {
-  const { columns, rows } = authorsTableData();
+// CreateUserModal import
+import CreateUserModal from "./component/createUserModal";
+import { AddBox, AddCircle, AddPhotoAlternateSharp } from "@mui/icons-material";
+
+function ListeEntrepots() {
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
     <DashboardLayout>
@@ -33,27 +41,30 @@ function ListEntrepots() {
                 bgColor="info"
                 borderRadius="lg"
                 coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
-                  Authors Table
+                  Liste des entrepots
                 </MDTypography>
+                <IconButton color="primary" onClick={handleOpenModal}>
+                  <AddCircle color="secondary" />
+                </IconButton>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                <DataTable />
               </MDBox>
             </Card>
           </Grid>
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* Create User Modal */}
+      <CreateUserModal open={openModal} onClose={handleCloseModal} />
     </DashboardLayout>
   );
 }
 
-export default ListEntrepots;
+export default ListeEntrepots;

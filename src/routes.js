@@ -7,7 +7,6 @@ import Chantiers from "pages/chantiers/ListChantiers";
 import NeedsPlanning from "pages/chantiers/Besoins";
 import ConsumptionTracking from "pages/chantiers/SuiviConsommation"; //
 import DailyReport from "pages/chantiers/RapportJournalier";
-import WarehousesList from "layouts/dashboard";
 import TransfersHistory from "layouts/dashboard";
 import RegisterOrder from "layouts/dashboard";
 import OrdersList from "layouts/dashboard";
@@ -16,6 +15,7 @@ import UsersList from "pages/administration/ListUsers";
 import AlertSettings from "layouts/dashboard";
 
 import Icon from "@mui/material/Icon";
+import ListEntrepots from "pages/entrepots/ListEntrepots";
 
 const routes = [
   {
@@ -115,7 +115,7 @@ const routes = [
         name: "Liste des entrepôts",
         key: "warehouses-list",
         route: "/warehouses/warehouses-list",
-        component: <WarehousesList />,
+        component: <ListEntrepots />,
         icon: <Icon fontSize="small">view_list</Icon>,
         roles: ["administrateur", "commercial"],
       },
