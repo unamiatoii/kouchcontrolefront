@@ -1,0 +1,45 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6); /* Couche d'arrière-plan semi-transparente */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1050;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .modal.fade {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  
+  .modal.fade.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .modal-dialog {
+    max-width: 80%; /* Ajustez selon vos besoins (ex: 80%, 1000px, etc.) */
+    width: 100%; /* S'assurer que le modal occupe la largeur spécifiée */
+  }
+  
+  .modal-content {
+    border-radius: 15px; 
+    overflow: hidden; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.5s ease-in-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(-50%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
