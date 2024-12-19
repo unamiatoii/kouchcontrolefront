@@ -1,22 +1,23 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import storageSession from "redux-persist/lib/storage/session";
 import { createFilter } from "redux-persist-transform-filter";
 import authReducer from "../domain/authSlice";
 import userReducer from "../domain/userSlice";
-import roleReducer from "../domain/roleSlice"; // Import roleReducer
+import roleReducer from "../domain/roleSlice";
 
 // Persist configuration for auth and user slices
 const authFilter = createFilter("auth", ["token", "user"]);
+
 const authPersistConfig = {
   key: "auth",
-  storage,
+  storage: storageSession,
   transforms: [authFilter],
 };
 
 const userPersistConfig = {
   key: "users",
-  storage,
+  storage: storageSession, // Correction ici
 };
 
 // Applying persist configurations to reducers
@@ -28,7 +29,7 @@ const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     users: persistedUserReducer,
-    roles: roleReducer,
+    roles: roleReducer, // Non persisté
   },
 });
 
