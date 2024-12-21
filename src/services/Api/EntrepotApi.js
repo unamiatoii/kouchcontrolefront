@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL = axios.create({
-  baseURL: "https://kouchcontrol.digitalbox.ci/api/chantiers",
+  baseURL: "https://kouchcontrol.digitalbox.ci/api/entrepots",
   headers: {
     "Content-Type": "application/json",
   },
@@ -32,70 +32,70 @@ API_URL.interceptors.request.use(
   }
 );
 
-// Fonction pour récupérer tous les chantiers
-export const getChantiers = async () => {
+// Fonction pour récupérer tous les entrepots
+export const getEntrepots = async () => {
   try {
     const response = await API_URL.get("/");
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la récupération des chantiers :",
+      "Erreur lors de la récupération des entrepots :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour récupérer un chantier par ID
-export const getChantierById = async (id) => {
+// Fonction pour récupérer un entrepot par ID
+export const getEntrepotById = async (id) => {
   try {
     const response = await API_URL.get(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la récupération de l'chantier avec ID ${id}:`,
+      `Erreur lors de la récupération de l'entrepot avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour créer un nouvel chantier
-export const createChantier = async (data) => {
+// Fonction pour créer un nouvel entrepot
+export const createEntrepot = async (data) => {
   try {
     const response = await API_URL.post("/", data);
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la création d'un chantier :",
+      "Erreur lors de la création d'un entrepot :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour mettre à jour un chantier existant
-export const updateChantier = async (id, data) => {
+// Fonction pour mettre à jour un entrepot existant
+export const updateEntrepot = async (id, data) => {
   try {
     const response = await API_URL.put(`/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la mise à jour de l'chantier avec ID ${id}:`,
+      `Erreur lors de la mise à jour de l'entrepot avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour supprimer un chantier
-export const deleteChantier = async (id) => {
+// Fonction pour supprimer un entrepot
+export const deleteEntrepot = async (id) => {
   try {
     const response = await API_URL.delete(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la suppression de l'chantier avec ID ${id}:`,
+      `Erreur lors de la suppression de l'entrepot avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
