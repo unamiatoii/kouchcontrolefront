@@ -72,7 +72,7 @@ const routes = [
       {
         name: "Liste des chantiers",
         key: "sites-list",
-        route: "/sites/liste-chantiers",
+        route: "/chantiers/liste-chantiers",
         component: <SitesList />,
         icon: <Icon fontSize="small">list_alt</Icon>,
         roles: ["administrateur", "commercial"],
@@ -114,7 +114,7 @@ const routes = [
       {
         name: "Liste des entrepôts",
         key: "Liste des entrepôts",
-        route: "/warehouses/warehouses-list",
+        route: "/entrepots/liste-entrepots",
         component: <WarehousesList />,
         icon: <Icon fontSize="small">view_list</Icon>,
         roles: ["administrateur", "commercial"],

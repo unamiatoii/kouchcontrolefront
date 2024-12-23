@@ -45,3 +45,72 @@ export const getChefsChantiers = async () => {
     throw error;
   }
 };
+// Fonction pour récupérer tous les utilisateurs
+export const getUsers = async () => {
+  try {
+    const response = await API_URL.get("/");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des utilisateurs :",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Fonction pour récupérer un utilisateur par ID
+export const getUserById = async (id) => {
+  try {
+    const response = await API_URL.get(`/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération de l'utilisateur avec ID ${id}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Fonction pour créer un nouvel utilisateur
+export const createUser = async (data) => {
+  try {
+    const response = await API_URL.post("/", data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la création d'un utilisateur :",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Fonction pour mettre à jour un utilisateur existant
+export const updateUser = async (id, data) => {
+  try {
+    const response = await API_URL.put(`/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Erreur lors de la mise à jour de l'utilisateur avec ID ${id}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Fonction pour supprimer un utilisateur
+export const deleteUser = async (id) => {
+  try {
+    const response = await API_URL.delete(`/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Erreur lors de la suppression de l'utilisateur avec ID ${id}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
