@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -21,6 +22,8 @@ function ListeChantiers() {
   const [selectedChantier, setSelectedChantier] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [chantierToDelete, setChantierToDelete] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchChantiers();
@@ -81,6 +84,10 @@ function ListeChantiers() {
     setShowChantierModal(true);
   };
 
+  const handleShowStockChantier = (chantierId) => {
+    navigate(`/chantier-stock/${chantierId}`);
+  };
+
   const handleCloseChantierModal = () => {
     setShowChantierModal(false);
     setSelectedChantier(null);
@@ -131,9 +138,6 @@ function ListeChantiers() {
                   Ajouter un chantier
                 </button>
               </MDBox>
-<<<<<<< HEAD
-              <MDBox pt={3}></MDBox>
-=======
               <MDBox pt={3}>
                 {loading ? (
                   <div className="text-center my-3">
@@ -172,10 +176,16 @@ function ListeChantiers() {
                                 Modifier
                               </button>
                               <button
-                                className="btn btn-danger btn-sm"
+                                className="btn btn-danger btn-sm me-2"
                                 onClick={() => handleOpenConfirmationModal(chantier)}
                               >
                                 Supprimer
+                              </button>
+                              <button
+                                className="btn btn-info btn-sm me-2"
+                                onClick={() => handleShowStockChantier(chantier.id)}
+                              >
+                                Voir le stock
                               </button>
                             </td>
                           </tr>
@@ -191,7 +201,6 @@ function ListeChantiers() {
                   </table>
                 )}
               </MDBox>
->>>>>>> ngoran
             </Card>
           </Grid>
         </Grid>

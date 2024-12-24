@@ -102,7 +102,7 @@ export const deleteStock = async (id) => {
 // Voir le stock d'un chantier
 export const getStockChantier = async (id) => {
   try {
-    const response = await API_URL.get(`/${id}`);
+    const response = await API_URL.get(`/chantier/${id}`);
     return response.data;
   } catch (error) {
     console.error(
@@ -115,7 +115,7 @@ export const getStockChantier = async (id) => {
 // Voir le stock d'un entrepot
 export const getStockEntrepot = async (id) => {
   try {
-    const response = await API_URL.get(`/${id}`);
+    const response = await API_URL.get(`/entrepot/${id}`);
     return response.data;
   } catch (error) {
     console.error(

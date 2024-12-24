@@ -121,9 +121,6 @@ function ListeEntrepots() {
                   Ajouter un entrepot
                 </button>
               </MDBox>
-<<<<<<< HEAD
-              <MDBox pt={3}></MDBox>
-=======
               <MDBox pt={3}>
                 <div className="text-center">
                   {loading ? (
@@ -177,7 +174,6 @@ function ListeEntrepots() {
                   )}
                 </div>
               </MDBox>
->>>>>>> ngoran
             </Card>
           </Grid>
         </Grid>
