@@ -38,15 +38,7 @@ function HistoriqueTransfert() {
                   Authors Table
                 </MDTypography>
               </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
+              <MDBox pt={3}></MDBox>
             </Card>
           </Grid>
         </Grid>
