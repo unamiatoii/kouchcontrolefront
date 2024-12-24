@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { createArticle, updateArticle } from "services/Api/ArticleApi";
 import { getCategories } from "services/Api/CategorieApi";
 
@@ -10,6 +12,7 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
   const [reorderThreshold, setReorderThreshold] = useState("");
   const [description, setDescription] = useState("");
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // État pour gérer le chargement
 
   useEffect(() => {
     fetchCategories();
@@ -46,6 +49,7 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Activer le chargement
     try {
       const articleData = {
         name,
@@ -57,14 +61,19 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
 
       if (article) {
         await updateArticle(article.id, articleData);
+        toast.success("Article modifié avec succès.");
       } else {
         await createArticle(articleData);
+        toast.success("Article enregistré avec succès.");
       }
 
       refreshArticles();
       closeModal();
     } catch (error) {
+      toast.error("Erreur lors de l'enregistrement de l'article.");
       console.error("Erreur lors de l'enregistrement de l'article :", error);
+    } finally {
+      setIsLoading(false); // Désactiver le chargement
     }
   };
 
@@ -72,7 +81,6 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
     <div
       className="modal fade show"
       id="articleModal"
-      tabIndex="-1"
       aria-labelledby="articleModalLabel"
       aria-hidden="false"
       style={{
@@ -151,8 +159,21 @@ const ArticleModal = ({ article, refreshArticles, closeModal }) => {
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
                 Annuler
               </button>
-              <button type="submit" className="btn btn-primary">
-                {article ? "Mettre à jour" : "Ajouter"}
+              <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>{" "}
+                    Chargement...
+                  </>
+                ) : article ? (
+                  "Mettre à jour"
+                ) : (
+                  "Ajouter"
+                )}
               </button>
             </div>
           </form>
