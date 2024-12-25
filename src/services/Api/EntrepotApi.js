@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = axios.create({// @mui material components
+const API_URL = axios.create({
+  // @mui material components
 
   baseURL: "https://kouchcontrol.digitalbox.ci/api/entrepots",
   headers: {

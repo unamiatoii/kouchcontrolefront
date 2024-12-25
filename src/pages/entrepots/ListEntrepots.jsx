@@ -198,9 +198,6 @@ function ListeEntrepots() {
       )}
 
       <Footer />
-
-      {/* Create Entrepot Modal */}
-      <CreateEntrepotModal open={openModal} onClose={handleCloseModal} />
     </DashboardLayout>
   );
 }
