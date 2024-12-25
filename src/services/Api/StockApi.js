@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL = axios.create({
-  baseURL: "https://kouchcontrol.digitalbox.ci/api/articles",
+  baseURL: "https://kouchcontrol.digitalbox.ci/api/stocks",
   headers: {
     "Content-Type": "application/json",
   },
@@ -32,83 +32,96 @@ API_URL.interceptors.request.use(
   }
 );
 
-// Fonction pour récupérer tous les articles
-export const getArticles = async () => {
+// Fonction pour récupérer tous les stocks
+export const getStocks = async () => {
   try {
     const response = await API_URL.get("/");
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la récupération des articles :",
+      "Erreur lors de la récupération des stocks :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour récupérer un article par ID
-export const getArticleById = async (id) => {
+// Fonction pour récupérer un stock par ID
+export const getStockById = async (id) => {
   try {
     const response = await API_URL.get(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la récupération de l'article avec ID ${id}:`,
+      `Erreur lors de la récupération du stock avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour créer un nouvel article
-export const createArticle = async (data) => {
+// Fonction pour créer un nouvel stock
+export const createStock = async (data) => {
   try {
     const response = await API_URL.post("/", data);
     return response.data;
   } catch (error) {
-    console.error(
-      "Erreur lors de la création d'un article :",
-      error.response?.data || error.message
-    );
+    console.error("Erreur lors de la création d'un stock :", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Fonction pour mettre à jour un article existant
-export const updateArticle = async (id, data) => {
+// Fonction pour mettre à jour un stock existant
+export const updateStock = async (id, data) => {
   try {
     const response = await API_URL.put(`/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la mise à jour de l'article avec ID ${id}:`,
+      `Erreur lors de la mise à jour de l'stock avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour supprimer un article
-export const deleteArticle = async (id) => {
+// Fonction pour supprimer un stock
+export const deleteStock = async (id) => {
   try {
     const response = await API_URL.delete(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Erreur lors de la suppression de l'article avec ID ${id}:`,
+      `Erreur lors de la suppression de l'stock avec ID ${id}:`,
       error.response?.data || error.message
     );
     throw error;
   }
 };
 
-// Fonction pour transferer un ou plusieurs article(s) vers un entrepot ou un chantier
-export const transfertArticleToEntrepotOrChantier = async (data) => {
+// Voir le stock d'un chantier
+export const getStockChantier = async (id) => {
   try {
-    const response = await API_URL.post("/transfert", data);
+    const response = await API_URL.get(`/chantier/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Erreur lors du transfert :", error.response?.data || error.message);
+    console.error(
+      "Erreur lors de la recuperation du stock :",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+// Voir le stock d'un entrepot
+export const getStockEntrepot = async (id) => {
+  try {
+    const response = await API_URL.get(`/entrepot/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la recuperation du stock :",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };

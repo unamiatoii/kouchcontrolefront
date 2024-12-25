@@ -7,6 +7,7 @@ import Chantiers from "pages/chantiers/ListChantiers";
 import NeedsPlanning from "pages/chantiers/Besoins";
 import ConsumptionTracking from "pages/chantiers/SuiviConsommation"; //
 import DailyReport from "pages/chantiers/RapportJournalier";
+import WarehousesList from "pages/entrepots/ListEntrepots";
 import TransfersHistory from "layouts/dashboard";
 import RegisterOrder from "layouts/dashboard";
 import OrdersList from "layouts/dashboard";
@@ -21,7 +22,7 @@ const routes = [
   {
     type: "collapse",
     name: "Tableau de bord",
-    key: "dashboard",
+    key: "Tableau de bord",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
@@ -37,8 +38,8 @@ const routes = [
     children: [
       {
         name: "Liste des articles",
-        key: "articles-list",
-        route: "/stocks/articles-list",
+        key: "Liste des articles",
+        route: "/stocks/liste-articles",
         component: <ArticlesList />,
         icon: <Icon fontSize="small">list</Icon>,
         roles: ["administrateur", "chef", "gestionnaire"],
@@ -72,7 +73,7 @@ const routes = [
       {
         name: "Liste des chantiers",
         key: "sites-list",
-        route: "/sites/sites-list",
+        route: "/chantiers/liste-chantiers",
         component: <SitesList />,
         icon: <Icon fontSize="small">list_alt</Icon>,
         roles: ["administrateur", "commercial"],
@@ -113,8 +114,8 @@ const routes = [
     children: [
       {
         name: "Liste des entrepôts",
-        key: "warehouses-list",
-        route: "/warehouses/warehouses-list",
+        key: "Liste des entrepôts",
+        route: "/entrepots/liste-entrepots",
         component: <ListEntrepots />,
         icon: <Icon fontSize="small">view_list</Icon>,
         roles: ["administrateur", "commercial"],

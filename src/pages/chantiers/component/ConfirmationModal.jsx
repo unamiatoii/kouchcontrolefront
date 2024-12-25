@@ -1,26 +1,26 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const ConfirmationModal = ({ article, handleDelete, closeModal }) => {
+const ConfirmationModal = ({ chantier, handleDelete, closeModal }) => {
   return (
     <div
       className="modal fade show"
       id="confirmationModal"
       tabIndex="-1"
       aria-labelledby="confirmationModalLabel"
-      aria-hidden={!article}
+      aria-hidden={!chantier}
       style={{ display: "block", opacity: 1 }}
     >
       <div className="modal-dialog" style={{ maxWidth: "40%" }}>
         <div className="modal-content">
           <div className="modal-body">
-            Êtes-vous sûr de vouloir supprimer cet article <strong>{article?.name}</strong> ?
+            Êtes-vous sûr de vouloir supprimer cet chantier <strong>{chantier?.name}</strong> ?
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={closeModal}>
               Annuler
             </button>
-            <button type="button" className="btn btn-danger" onClick={() => handleDelete(article)}>
+            <button type="button" className="btn btn-danger" onClick={() => handleDelete(chantier)}>
               Supprimer
             </button>
           </div>
@@ -31,7 +31,7 @@ const ConfirmationModal = ({ article, handleDelete, closeModal }) => {
 };
 
 ConfirmationModal.propTypes = {
-  article: PropTypes.object.isRequired,
+  chantier: PropTypes.object.isRequired,
   handleDelete: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
 };

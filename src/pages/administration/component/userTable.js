@@ -8,7 +8,7 @@ import DataTableHeadCell from "./DataTableHeadCell";
 import DataTableBodyCell from "./DataTableBodyCell";
 import { fetchUsers } from "domain/userSlice";
 import EditUserModal from "../component/updateUserModal";
-import { fetchRoles } from "domain/roleSlice";
+import { capitalize } from "utils/stringOperation.js";
 
 function DataTable({ entriesPerPage, canSearch, isSorted, noEndBorder }) {
   const dispatch = useDispatch();

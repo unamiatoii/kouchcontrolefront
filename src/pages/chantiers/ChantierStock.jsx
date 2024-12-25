@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types"; // Importation de PropTypes
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -8,13 +9,12 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getArticles, deleteArticle } from "services/Api/ArticleApi";
-import ArticleModal from "./component/ArticleModal";
+import { getStockChantier } from "services/Api/StockApi";
 import ConfirmationModal from "./component/ConfirmationModal";
-import TransferModal from "./component/TransferModal";
 import Badge from "react-bootstrap/Badge";
 
-function ListeArticles() {
+function ChantierStock({ chantierId }) {
+  // Ajout de chantierId dans les props
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [search, setSearch] = useState("");
@@ -30,12 +30,13 @@ function ListeArticles() {
 
   useEffect(() => {
     fetchArticles();
-  }, []);
+  }, [chantierId]); // Assurez-vous de relancer l'appel si chantierId change
 
   const fetchArticles = async () => {
     setLoading(true);
     try {
-      const data = await getArticles();
+      const data = await getStockChantier(chantierId); // Utilisation de chantierId
+      console.log(data);
       setArticles(data);
       setFilteredArticles(data);
     } catch (error) {
@@ -123,7 +124,7 @@ function ListeArticles() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
-                  Liste des articles
+                  Liste des articles en stock
                 </MDTypography>
                 <input
                   type="text"
@@ -138,19 +139,7 @@ function ListeArticles() {
                     className="btn btn-primary me-2 mb-1"
                     onClick={() => openModal("article")}
                   >
-                    Ajouter un article
-                  </button>
-                  <button
-                    className="btn btn-primary me-2 mb-1"
-                    onClick={() => openModal("transfer", null, "entrepot")}
-                  >
-                    Transfert vers un Entrepôt
-                  </button>
-                  <button
-                    className="btn btn-secondary mb-1"
-                    onClick={() => openModal("transfer", null, "chantier")}
-                  >
-                    Transfert vers un Chantier
+                    Demande de reapprovisionement
                   </button>
                 </div>
               </MDBox>
@@ -231,15 +220,6 @@ function ListeArticles() {
           </Grid>
         </Grid>
       </MDBox>
-
-      {modalState.articleModal && (
-        <ArticleModal
-          article={modalState.selectedArticle}
-          refreshArticles={fetchArticles}
-          closeModal={closeModal}
-        />
-      )}
-
       {modalState.confirmationModal && (
         <ConfirmationModal
           article={modalState.selectedArticle}
@@ -247,21 +227,14 @@ function ListeArticles() {
           closeModal={closeModal}
         />
       )}
-
-      {modalState.transferModal && (
-        <TransferModal
-          selectedArticles={selectedArticles.map((id) =>
-            articles.find((article) => article.id === id)
-          )}
-          transferType={modalState.transferType}
-          closeModal={closeModal}
-          refreshArticles={fetchArticles}
-        />
-      )}
-
       <Footer />
     </DashboardLayout>
   );
 }
 
-export default ListeArticles;
+// Validation des props
+ChantierStock.propTypes = {
+  chantierId: PropTypes.number.isRequired, // chantierId est requis et doit être un nombre
+};
+
+export default ChantierStock;
