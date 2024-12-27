@@ -31,7 +31,6 @@ API_URL.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 // Fonction pour récupérer tous les stocks
 export const getStocks = async () => {
   try {
@@ -100,18 +99,26 @@ export const deleteStock = async (id) => {
 };
 
 // Voir le stock d'un chantier
-export const getStockChantier = async (id) => {
+export const getStockChantier = async (chantierId) => {
+  if (!chantierId) {
+    throw new Error("L'ID du chantier est manquant.");
+  }
+
   try {
-    const response = await API_URL.get(`/chantier/${id}`);
+    const response = await API_URL.get(`/chantier/${chantierId}`);
+    if (!response.data || response.data.length === 0) {
+      throw new Error(`Aucun stock trouvé pour le chantier avec ID ${chantierId}.`);
+    }
     return response.data;
   } catch (error) {
     console.error(
-      "Erreur lors de la recuperation du stock :",
+      "Erreur lors de la récupération des stocks du chantier :",
       error.response?.data || error.message
     );
     throw error;
   }
 };
+
 // Voir le stock d'un entrepot
 export const getStockEntrepot = async (id) => {
   try {

@@ -172,6 +172,7 @@ function ListeArticles() {
                             checked={selectedArticles.length === filteredArticles.length}
                           />
                         </th>
+                        <th>Code</th>
                         <th>Nom</th>
                         <th>Catégorie</th>
                         <th>Prix</th>
@@ -191,6 +192,7 @@ function ListeArticles() {
                                 onChange={() => toggleSelection(article.id)}
                               />
                             </td>
+                            <td className="fw-bold">#{article.code}</td>
                             <td>{article.name}</td>
                             <td>{article.category?.name}</td>
                             <td>{article.price} FCFA</td>

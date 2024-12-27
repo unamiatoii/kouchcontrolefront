@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types"; // Importation de PropTypes
+import PropTypes from "prop-types";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -10,91 +10,96 @@ import Footer from "examples/Footer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getStockChantier } from "services/Api/StockApi";
+import { useParams } from "react-router-dom";
 import ConfirmationModal from "./component/ConfirmationModal";
 import Badge from "react-bootstrap/Badge";
 
-function ChantierStock({ chantierId }) {
-  // Ajout de chantierId dans les props
-  const [articles, setArticles] = useState([]);
+function ChantierStock() {
+  const [stock, setStock] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalState, setModalState] = useState({
-    articleModal: false,
     confirmationModal: false,
-    transferModal: false,
     selectedArticle: null,
-    transferType: null,
   });
   const [selectedArticles, setSelectedArticles] = useState([]);
+  const { chantierId } = useParams();
 
+  // Function to fetch stock data for the chantier
   useEffect(() => {
-    fetchArticles();
-  }, [chantierId]); // Assurez-vous de relancer l'appel si chantierId change
-
-  const fetchArticles = async () => {
-    setLoading(true);
-    try {
-      const data = await getStockChantier(chantierId); // Utilisation de chantierId
-      console.log(data);
-      setArticles(data);
-      setFilteredArticles(data);
-    } catch (error) {
-      toast.error("Erreur lors de la récupération des articles.");
-    } finally {
-      setLoading(false);
+    if (chantierId) {
+      setLoading(true);
+      getStockChantier(chantierId)
+        .then((data) => {
+          if (data.length === 0) {
+            toast.warn("Aucun stock trouvé pour ce chantier.");
+          }
+          setStock(data);
+          setFilteredArticles(data);
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des stocks du chantier :", error);
+          toast.error("Erreur lors de la récupération des stocks.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      console.error("ID du chantier manquant.");
+      toast.error("L'ID du chantier est manquant.");
     }
-  };
+  }, [chantierId]);
 
+  // Search filter function
   const handleSearch = (e) => {
-    setSearch(e.target.value);
-    const results = articles.filter((article) =>
-      article.name?.toLowerCase().includes(e.target.value.toLowerCase())
+    const value = e.target.value.toLowerCase();
+    setSearch(value);
+    setFilteredArticles(
+      stock.filter((article) => article.article_name?.toLowerCase().includes(value))
     );
-    setFilteredArticles(results);
   };
 
+  // Toggle selection of articles
   const toggleSelection = (articleId) => {
     setSelectedArticles((prev) =>
       prev.includes(articleId) ? prev.filter((id) => id !== articleId) : [...prev, articleId]
     );
   };
 
+  // Select or deselect all articles
   const handleSelectAll = () => {
-    if (selectedArticles.length === filteredArticles.length) {
-      setSelectedArticles([]);
-    } else {
-      setSelectedArticles(filteredArticles.map((article) => article.id));
-    }
+    setSelectedArticles(
+      selectedArticles.length === filteredArticles.length
+        ? []
+        : filteredArticles.map((article) => article.article_id)
+    );
   };
 
-  const openModal = (type, article = null, transferType = null) => {
-    setModalState({
-      articleModal: type === "article",
-      confirmationModal: type === "confirmation",
-      transferModal: type === "transfer",
-      selectedArticle: article,
-      transferType,
-    });
+  // Open confirmation modal
+  const openConfirmationModal = (article) => {
+    setModalState({ confirmationModal: true, selectedArticle: article });
   };
 
+  // Close modal
   const closeModal = () => {
-    setModalState({
-      articleModal: false,
-      confirmationModal: false,
-      transferModal: false,
-      selectedArticle: null,
-      transferType: null,
-    });
+    setModalState({ confirmationModal: false, selectedArticle: null });
   };
 
+  // Handle delete of an article
   const handleDelete = async () => {
-    if (!modalState.selectedArticle) return;
+    const { selectedArticle } = modalState;
+    if (!selectedArticle) return;
+
     setLoading(true);
     try {
-      await deleteArticle(modalState.selectedArticle.id);
       toast.success("Article supprimé avec succès.");
-      fetchArticles();
+      setStock((prevStock) =>
+        prevStock.filter((article) => article.article_id !== selectedArticle.article_id)
+      );
+      setFilteredArticles((prevFilteredArticles) =>
+        prevFilteredArticles.filter((article) => article.article_id !== selectedArticle.article_id)
+      );
     } catch (error) {
       toast.error("Erreur lors de la suppression de l'article.");
     } finally {
@@ -134,14 +139,6 @@ function ChantierStock({ chantierId }) {
                   onChange={handleSearch}
                   style={{ width: "350px" }}
                 />
-                <div>
-                  <button
-                    className="btn btn-primary me-2 mb-1"
-                    onClick={() => openModal("article")}
-                  >
-                    Demande de reapprovisionement
-                  </button>
-                </div>
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
@@ -161,10 +158,12 @@ function ChantierStock({ chantierId }) {
                             checked={selectedArticles.length === filteredArticles.length}
                           />
                         </th>
+                        <th>Code</th>
                         <th>Nom</th>
                         <th>Catégorie</th>
-                        <th>Prix</th>
-                        <th>Seuil</th>
+                        <th>Prix Unitaire</th>
+                        <th>Prix Total</th>
+                        <th>Quantité Total</th>
                         <th>Description</th>
                         <th>Actions</th>
                       </tr>
@@ -172,33 +171,33 @@ function ChantierStock({ chantierId }) {
                     <tbody>
                       {filteredArticles.length > 0 ? (
                         filteredArticles.map((article) => (
-                          <tr key={article.id}>
+                          <tr key={article.article_id}>
                             <td>
                               <input
                                 type="checkbox"
-                                checked={selectedArticles.includes(article.id)}
-                                onChange={() => toggleSelection(article.id)}
+                                checked={selectedArticles.includes(article.article_id)}
+                                onChange={() => toggleSelection(article.article_id)}
                               />
                             </td>
-                            <td>{article.name}</td>
-                            <td>{article.category?.name}</td>
-                            <td>{article.price} FCFA</td>
+                            <td className="fw-bold">#{article.article_code}</td>
+                            <td>{article.article_name}</td>
+                            <td>{article.category_name || "Non défini"}</td>
+                            <td>{article.article_price}</td>
                             <td>
-                              <Badge pill bg="info">
-                                {article.reorder_threshold}
+                              <Badge pill bg="primary">
+                                {article.total_price} FCFA
                               </Badge>
                             </td>
-                            <td>{article.description}</td>
+                            <td>
+                              <Badge pill bg="info">
+                                {article.total_quantity}
+                              </Badge>
+                            </td>
+                            <td>{article.article_description || "Aucune description"}</td>
                             <td>
                               <button
-                                className="btn btn-warning btn-sm me-2"
-                                onClick={() => openModal("article", article)}
-                              >
-                                Modifier
-                              </button>
-                              <button
                                 className="btn btn-danger btn-sm"
-                                onClick={() => openModal("confirmation", article)}
+                                onClick={() => openConfirmationModal(article)}
                               >
                                 Supprimer
                               </button>
@@ -232,9 +231,8 @@ function ChantierStock({ chantierId }) {
   );
 }
 
-// Validation des props
 ChantierStock.propTypes = {
-  chantierId: PropTypes.number.isRequired, // chantierId est requis et doit être un nombre
+  chantierId: PropTypes.number.isRequired,
 };
 
 export default ChantierStock;
