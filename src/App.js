@@ -17,6 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import { logoutUser } from "./domain/authSlice";
 import ChantierStock from "pages/chantiers/ChantierStock";
+import EntrepotStock from "pages/entrepots/EntrepotStock";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -129,6 +130,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
             <Route path="/chantier-stock/:chantierId" element={<ChantierStock />} />
+            <Route path="/stock/entrepot/:entrepotId" element={<EntrepotStock />} />
           </Routes>
         </>
       ) : (

@@ -10,7 +10,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getEntrepots, deleteEntrepot } from "services/Api/EntrepotApi";
 import EntrepotModal from "./component/EntrepotModal";
-import ConfirmationModal from "./component/ConfirmationModal"; // Import du modal de confirmation
+import ConfirmationModal from "./component/ConfirmationModal";
+import { useNavigate } from "react-router-dom";
 
 function ListeEntrepots() {
   const [entrepots, setEntrepots] = useState([]);
@@ -21,6 +22,8 @@ function ListeEntrepots() {
   const [selectedEntrepot, setSelectedEntrepot] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [entrepotToDelete, setEntrepotToDelete] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchEntrepots();
@@ -52,7 +55,6 @@ function ListeEntrepots() {
       setLoading(false);
     }
   };
-
   const handleSearch = (e) => {
     setSearch(e.target.value);
     const results = entrepots.filter((entrepot) =>
@@ -84,6 +86,9 @@ function ListeEntrepots() {
   const handleCloseConfirmationModal = () => {
     setShowConfirmationModal(false); // Close the confirmation modal
     setEntrepotToDelete(null); // Reset the entrepot to delete
+  };
+  const handleShowStockEntrepot = (entrepotId) => {
+    navigate(`/stock/entrepot/${entrepotId}`);
   };
 
   return (
@@ -158,6 +163,12 @@ function ListeEntrepots() {
                                   onClick={() => handleOpenConfirmationModal(entrepot)}
                                 >
                                   Supprimer
+                                </button>
+                                <button
+                                  className="btn btn-info btn-sm me-2"
+                                  onClick={() => handleShowStockEntrepot(entrepot.id)}
+                                >
+                                  Voir le stock
                                 </button>
                               </td>
                             </tr>

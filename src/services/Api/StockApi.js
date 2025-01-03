@@ -120,9 +120,9 @@ export const getStockChantier = async (chantierId) => {
 };
 
 // Voir le stock d'un entrepot
-export const getStockEntrepot = async (id) => {
+export const getStockEntrepot = async (entrepotId) => {
   try {
-    const response = await API_URL.get(`/entrepot/${id}`);
+    const response = await API_URL.get(`/entrepot/${entrepotId}`);
     return response.data;
   } catch (error) {
     console.error(
