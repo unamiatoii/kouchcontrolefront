@@ -128,7 +128,7 @@ function TransferModal({ selectedArticles, transferType, closeModal, refreshArti
               <tbody>
                 {selectedArticles.map((article) => (
                   <tr key={article.id}>
-                    <td>{article.id}</td>
+                    <td>{article.code}</td>
                     <td>{article.name}</td>
                     <td>{article.reorder_threshold}</td>
                     <td>

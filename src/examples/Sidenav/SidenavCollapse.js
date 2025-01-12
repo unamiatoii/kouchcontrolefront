@@ -7,29 +7,20 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Icon from "@mui/material/Icon";
 
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Custom styles for the SidenavCollapse
 import {
   collapseItem,
   collapseIconBox,
   collapseIcon,
   collapseText,
 } from "examples/Sidenav/styles/sidenavCollapse";
-
-// Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
 function SidenavCollapse({ icon, name, route, active, ...rest }) {
   const [controller] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
-
-  // Utilisation de useLocation pour obtenir la route actuelle
   const location = useLocation();
-
-  // Vérifie si la route est active
-  const isActive = location.pathname === route;
+  const isActive = route && location.pathname === route;
 
   return (
     <ListItem component="li">
@@ -37,7 +28,7 @@ function SidenavCollapse({ icon, name, route, active, ...rest }) {
         {...rest}
         sx={(theme) =>
           collapseItem(theme, {
-            active: isActive || active, // Applique 'active' si c'est la route courante ou si 'active' est passé en props
+            active: isActive || active,
             transparentSidenav,
             whiteSidenav,
             darkMode,
@@ -72,17 +63,14 @@ function SidenavCollapse({ icon, name, route, active, ...rest }) {
     </ListItem>
   );
 }
-
-// Setting default values for the props of SidenavCollapse
 SidenavCollapse.defaultProps = {
   active: false,
+  route: "",
 };
-
-// Typechecking props for the SidenavCollapse
 SidenavCollapse.propTypes = {
   icon: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
-  route: PropTypes.string.isRequired, // Assurez-vous que la route est passée en prop
+  route: PropTypes.string,
   active: PropTypes.bool,
 };
 

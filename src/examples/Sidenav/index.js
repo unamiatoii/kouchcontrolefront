@@ -5,7 +5,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import SidenavRoot from "examples/Sidenav/SidenavRoot";
-import AccordionMenu from "examples/Accordeons"; // Importation du composant AccordionMenu
+import AccordionMenu from "examples/Accordeons";
 import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
 import Divider from "@mui/material/Divider";
@@ -22,16 +22,14 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const [activeMenus, setActiveMenus] = useState({});
-  const role = user?.role;
-  const textColor =
-    transparentSidenav || (whiteSidenav && !darkMode)
-      ? "dark"
-      : whiteSidenav && darkMode
-      ? "inherit"
-      : "white";
+  const role = user?.role || "";
 
+  const textColor = transparentSidenav || (whiteSidenav && !darkMode) ? "dark" : "white";
+
+  // Gérer la fermeture du sidenav
   const closeSidenav = () => setMiniSidenav(dispatch, true);
 
+  // Basculer l'état des menus actifs
   const toggleMenu = (key) => {
     setActiveMenus((prevState) => ({
       ...prevState,
@@ -39,29 +37,31 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
     }));
   };
 
+  // Gestion de la taille de l'écran
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth < 1200;
       setMiniSidenav(dispatch, isMobile);
-      setTransparentSidenav(dispatch, !isMobile && transparentSidenav);
-      setWhiteSidenav(dispatch, !isMobile && whiteSidenav);
     };
+
     window.addEventListener("resize", handleResize);
     handleResize();
+
     return () => window.removeEventListener("resize", handleResize);
-  }, [dispatch, transparentSidenav, whiteSidenav]);
+  }, [dispatch]);
 
-  const filterRoutes = (routes) =>
-    routes
-      .map((route) => {
-        if (route.roles && !route.roles.includes(user?.role)) return null;
-        const filteredChildren = route.children?.filter(
-          (child) => !child.roles || child.roles.includes(user?.role)
-        );
-        return { ...route, children: filteredChildren };
-      })
-      .filter(Boolean);
+  // Filtrer les routes selon le rôle de l'utilisateur
+  const filteredRoutes = routes
+    .map((route) => {
+      if (route.roles && !route.roles.includes(role)) return null;
+      const filteredChildren = route.children?.filter(
+        (child) => !child.roles || child.roles.includes(role)
+      );
+      return { ...route, children: filteredChildren };
+    })
+    .filter(Boolean);
 
+  // Vérifier si une route est active
   const isRouteActive = (routePath) => location.pathname === routePath;
 
   return (
@@ -70,7 +70,8 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
       variant="permanent"
       ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
     >
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
+      {/* En-tête */}
+      <MDBox pt={1} pb={1} px={4} textAlign="center">
         <MDBox
           display={{ xs: "block", xl: "none" }}
           position="absolute"
@@ -83,33 +84,37 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
           <Icon sx={{ fontWeight: "bold" }}>close</Icon>
         </MDBox>
         <MDBox component={NavLink} to="/dashboard" display="flex" alignItems="center">
-          {brand && <MDBox component="img" src={brand} alt="Brand" width="3rem" />}
+          {brand && <MDBox component="img" src={brand} alt="logo" width="100%" />}
+        </MDBox>
+        {brandName && (
           <MDBox
-            width={!brandName && "100%"}
+            width="100%"
             sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
+            alignItems="center"
           >
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
-              {brandName}
-            </MDTypography>
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+            <MDTypography variant="h6" color={textColor}>
               {user?.name}
             </MDTypography>
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+            <MDTypography variant="button" fontWeight="medium" color={textColor}>
               {role}
             </MDTypography>
           </MDBox>
-        </MDBox>
+        )}
       </MDBox>
+
       <Divider light={!darkMode || whiteSidenav} />
-      {/* Menu principal */}
+
+      {/* Menu */}
       <MDBox>
-        {filterRoutes(routes).map(({ key, name, icon, children }) => (
+        {filteredRoutes.map(({ key, name, route, icon, children }) => (
           <AccordionMenu
             key={key}
             menuKey={key}
             name={name}
             icon={icon}
             collapseName={key}
+            route={route || ""}
+            active={isRouteActive(route)}
             isOpen={activeMenus[key] || isRouteActive(`/${key}`)}
             toggleMenu={() => toggleMenu(key)}
           >
@@ -125,18 +130,15 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
                 }}
               >
                 <SidenavCollapse
-                  key={child.key}
                   name={child.name}
                   icon={child.icon}
-                  route={child.route}
+                  route={child.route || ""}
                   active={isRouteActive(child.route)}
                 />
               </NavLink>
             ))}
           </AccordionMenu>
         ))}
-
-        {/* Déconnexion */}
         <MDBox p={2}>
           <MDButton
             color="error"
@@ -154,28 +156,28 @@ function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
 
 Sidenav.defaultProps = {
   brand: "",
+  brandName: "",
 };
 
-// Validation des PropTypes
 Sidenav.propTypes = {
   user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    role: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    role: PropTypes.string,
   }).isRequired,
   brand: PropTypes.string,
-  brandName: PropTypes.string.isRequired,
+  brandName: PropTypes.string,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
-      icon: PropTypes.string,
+      icon: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       roles: PropTypes.arrayOf(PropTypes.string),
       children: PropTypes.arrayOf(
         PropTypes.shape({
           key: PropTypes.string.isRequired,
           name: PropTypes.string.isRequired,
-          route: PropTypes.string.isRequired,
-          icon: PropTypes.string,
+          route: PropTypes.string,
+          icon: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
           roles: PropTypes.arrayOf(PropTypes.string),
         })
       ),

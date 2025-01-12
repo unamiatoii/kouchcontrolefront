@@ -140,18 +140,22 @@ function ListeArticles() {
                   >
                     Ajouter un article
                   </button>
-                  <button
-                    className="btn btn-primary me-2 mb-1"
-                    onClick={() => openModal("transfer", null, "entrepot")}
-                  >
-                    Transfert vers un Entrepôt
-                  </button>
-                  <button
-                    className="btn btn-secondary mb-1"
-                    onClick={() => openModal("transfer", null, "chantier")}
-                  >
-                    Transfert vers un Chantier
-                  </button>
+                  {selectedArticles.length > 0 && (
+                    <>
+                      <button
+                        className="btn btn-primary me-2 mb-1"
+                        onClick={() => openModal("transfer", null, "entrepot")}
+                      >
+                        Transfert vers un Entrepôt
+                      </button>
+                      <button
+                        className="btn btn-secondary mb-1"
+                        onClick={() => openModal("transfer", null, "chantier")}
+                      >
+                        Transfert vers un Chantier
+                      </button>
+                    </>
+                  )}
                 </div>
               </MDBox>
               <MDBox pt={3}>
@@ -176,8 +180,7 @@ function ListeArticles() {
                         <th>Nom</th>
                         <th>Catégorie</th>
                         <th>Prix</th>
-                        <th>Seuil</th>
-                        <th>Désignation</th>
+                        <th>Quantité/Seuil</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -200,8 +203,9 @@ function ListeArticles() {
                               <Badge pill bg="info">
                                 {article.reorder_threshold}
                               </Badge>
+                              &nbsp;
+                              <i>{article.unit}</i>
                             </td>
-                            <td>{article.description}</td>
                             <td>
                               <button
                                 className="btn btn-warning btn-sm me-2"
@@ -220,7 +224,7 @@ function ListeArticles() {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="7" className="text-center">
+                          <td colSpan="8" className="text-center">
                             Aucun article trouvé.
                           </td>
                         </tr>

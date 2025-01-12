@@ -20,15 +20,6 @@ import Icon from "@mui/material/Icon";
 const routes = [
   {
     type: "collapse",
-    name: "Tableau de bord",
-    key: "Tableau de bord",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <Dashboard />,
-    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
-  },
-  {
-    type: "collapse",
     name: "Gestion des stocks",
     key: "stocks",
     icon: <Icon fontSize="small">inventory_2</Icon>,
@@ -41,7 +32,7 @@ const routes = [
         route: "/stocks/liste-articles",
         component: <ArticlesList />,
         icon: <Icon fontSize="small">list</Icon>,
-        roles: ["administrateur", "chef", "gestionnaire"],
+        roles: ["administrateur", "chef chantier", "gestionnaire"],
       },
       {
         name: "Voir le stock",
@@ -49,7 +40,7 @@ const routes = [
         route: "/stocks/:userId",
         component: <ArticlesList />,
         icon: <Icon fontSize="small">list</Icon>,
-        roles: ["chef", "gestionnaire"],
+        roles: ["chef chantier", "gestionnaire"],
       },
       {
         name: "Liste des transferts",
@@ -67,7 +58,7 @@ const routes = [
     key: "sites",
     icon: <Icon fontSize="small">engineering</Icon>,
     isOpen: false,
-    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
+    roles: ["administrateur", "chef chantier", "gestionnaire", "commercial"],
     children: [
       {
         name: "Liste des chantiers",
@@ -91,7 +82,7 @@ const routes = [
         route: "/sites/consumption-tracking",
         component: <ConsumptionTracking />,
         icon: <Icon fontSize="small">bar_chart</Icon>,
-        roles: ["chef", "gestionnaire"],
+        roles: ["chef chantier", "gestionnaire"],
       },
       {
         name: "Rapport journalier",
@@ -99,7 +90,7 @@ const routes = [
         route: "/sites/daily-report",
         component: <DailyReport />,
         icon: <Icon fontSize="small">description</Icon>,
-        roles: ["chef", "gestionnaire", "commercial"],
+        roles: ["chef chantier", "gestionnaire", "commercial"],
       },
     ],
   },
@@ -109,7 +100,7 @@ const routes = [
     key: "warehouses",
     icon: <Icon fontSize="small">store</Icon>,
     isOpen: false,
-    roles: ["administrateur", "chef", "gestionnaire", "commercial"],
+    roles: ["administrateur", "chef chantier", "gestionnaire", "commercial"],
     children: [
       {
         name: "Liste des entrepôts",
@@ -125,7 +116,7 @@ const routes = [
         route: "/warehouses/transfers-history",
         component: <TransfersHistory />,
         icon: <Icon fontSize="small">history</Icon>,
-        roles: ["chef", "gestionnaire", "commercial"],
+        roles: ["chef chantier", "gestionnaire", "commercial"],
       },
     ],
   },
