@@ -12,6 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { getChantiers, deleteChantier } from "services/Api/ChantierApi";
 import ChantierModal from "./component/ChantierModal";
 import ConfirmationModal from "./component/ConfirmationModal";
+import { useSelector } from "react-redux";
+import { toSlug } from "../../utils/stringUtils";
 
 function ListeChantiers() {
   const [chantiers, setChantiers] = useState([]);
@@ -44,7 +46,6 @@ function ListeChantiers() {
 
   const handleDelete = async () => {
     if (!chantierToDelete) return;
-
     setLoading(true);
     try {
       await deleteChantier(chantierToDelete.id);
@@ -62,16 +63,11 @@ function ListeChantiers() {
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearch(query);
-
-    if (query.trim() === "") {
-      setFilteredChantiers(chantiers);
-      return;
-    }
-
-    const results = chantiers.filter((chantier) =>
-      chantier.name.toLowerCase().includes(query.toLowerCase())
+    setFilteredChantiers(
+      query.trim() === ""
+        ? chantiers
+        : chantiers.filter((chantier) => chantier.name.toLowerCase().includes(query.toLowerCase()))
     );
-    setFilteredChantiers(results);
   };
 
   const handleAddChantier = () => {
@@ -84,8 +80,8 @@ function ListeChantiers() {
     setShowChantierModal(true);
   };
 
-  const handleShowStockChantier = (chantierId) => {
-    navigate(`/chantier-stock/${chantierId}`);
+  const handleShowStockChantier = (chantierName) => {
+    navigate(`/chantier-stock/${chantierName}`);
   };
 
   const handleCloseChantierModal = () => {
@@ -183,7 +179,7 @@ function ListeChantiers() {
                               </button>
                               <button
                                 className="btn btn-info btn-sm me-2"
-                                onClick={() => handleShowStockChantier(chantier.id)}
+                                onClick={() => handleShowStockChantier(toSlug(chantier.name))}
                               >
                                 Voir le stock
                               </button>
@@ -205,8 +201,6 @@ function ListeChantiers() {
           </Grid>
         </Grid>
       </MDBox>
-
-      {/* Chantier Modal */}
       {showChantierModal && (
         <ChantierModal
           chantier={selectedChantier}
@@ -214,8 +208,6 @@ function ListeChantiers() {
           closeModal={handleCloseChantierModal}
         />
       )}
-
-      {/* Confirmation Modal */}
       {showConfirmationModal && (
         <ConfirmationModal
           chantier={chantierToDelete}
@@ -223,7 +215,6 @@ function ListeChantiers() {
           closeModal={handleCloseConfirmationModal}
         />
       )}
-
       <Footer />
     </DashboardLayout>
   );

@@ -112,3 +112,13 @@ export const transfertArticleToEntrepotOrChantier = async (data) => {
     throw error;
   }
 };
+// Fonction pour transferer un ou plusieurs article(s) vers un entrepot vers chantier ou un chantier vers entrepot
+export const transferArticlesEntrepotToChantierOrChantierToEntrepot = async (payload) => {
+  try {
+    const response = await API_URL.post("/transfert_stock", payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors du transfert :", error.response?.data || error.message);
+    throw error;
+  }
+};

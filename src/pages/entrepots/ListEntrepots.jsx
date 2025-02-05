@@ -12,6 +12,7 @@ import { getEntrepots, deleteEntrepot } from "services/Api/EntrepotApi";
 import EntrepotModal from "./component/EntrepotModal";
 import ConfirmationModal from "./component/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import { toSlug } from "../../utils/stringUtils";
 
 function ListeEntrepots() {
   const [entrepots, setEntrepots] = useState([]);
@@ -87,8 +88,8 @@ function ListeEntrepots() {
     setShowConfirmationModal(false); // Close the confirmation modal
     setEntrepotToDelete(null); // Reset the entrepot to delete
   };
-  const handleShowStockEntrepot = (entrepotId) => {
-    navigate(`/stock/entrepot/${entrepotId}`);
+  const handleShowStockEntrepot = (entrepotName) => {
+    navigate(`/stock/entrepot/${entrepotName}`);
   };
 
   return (
@@ -159,14 +160,14 @@ function ListeEntrepots() {
                                   Modifier
                                 </button>
                                 <button
-                                  className="btn btn-danger btn-sm"
+                                  className="btn btn-danger btn-sm me-2"
                                   onClick={() => handleOpenConfirmationModal(entrepot)}
                                 >
                                   Supprimer
                                 </button>
                                 <button
                                   className="btn btn-info btn-sm me-2"
-                                  onClick={() => handleShowStockEntrepot(entrepot.id)}
+                                  onClick={() => handleShowStockEntrepot(toSlug(entrepot.name))}
                                 >
                                   Voir le stock
                                 </button>

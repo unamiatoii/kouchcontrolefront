@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
+import { Grid, Card, CircularProgress, TextField, Checkbox } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -10,48 +9,58 @@ import Footer from "examples/Footer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getStockChantier } from "services/Api/StockApi";
-import { useParams } from "react-router-dom";
-import ConfirmationModal from "./component/ConfirmationModal";
 import Badge from "react-bootstrap/Badge";
+import EditStockModal from "../stocks/component/EditStockModal";
+import CommandeModal from "../chantiers/component/CommandeModal";
+import ConfirmationModal from "./component/ConfirmationModal";
+import TransferModal from "../stocks/component/TransferModal";
+import { useSelector } from "react-redux";
+import { toSlug } from "../../utils/stringUtils";
 
-function ChantierStock() {
+function StockChantier() {
   const [stock, setStock] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [modalState, setModalState] = useState({
-    confirmationModal: false,
-    selectedArticle: null,
-  });
   const [selectedArticles, setSelectedArticles] = useState([]);
-  const { chantierName } = useParams();
 
-  // Function to fetch stock data for the chantier
-  useEffect(() => {
-    if (chantierName) {
-      setLoading(true);
-      getStockChantier(chantierName)
-        .then((data) => {
-          if (data.length === 0) {
-            toast.warn("Aucun stock trouvé pour ce chantier.");
-          }
-          setStock(data);
-          setFilteredArticles(data);
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la récupération des stocks du chantier :", error);
-          toast.error("Erreur lors de la récupération des stocks.");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      console.error("ID du chantier manquant.");
-      toast.error("L'ID du chantier est manquant.");
+  const [modalState, setModalState] = useState({
+    type: null,
+    isOpen: false,
+    article: null,
+    transferType: null,
+  });
+
+  const user = useSelector((state) => state.auth.user);
+  const chantierName = toSlug(user?.chantier || "");
+
+  // Fetch stock data
+  const fetchStock = useCallback(async () => {
+    if (!chantierName) {
+      toast.error("Le nom du chantier est manquant.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await getStockChantier(chantierName);
+      //console.log(data);
+      setStock(data);
+      setFilteredArticles(data);
+      if (data.length === 0) {
+        toast.warn("Aucun stock trouvé pour ce chantier.");
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la récupération des stocks.");
+    } finally {
+      setLoading(false);
     }
   }, [chantierName]);
 
-  // Search filter function
+  useEffect(() => {
+    fetchStock();
+  }, [fetchStock]);
+
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
@@ -60,14 +69,12 @@ function ChantierStock() {
     );
   };
 
-  // Toggle selection of articles
   const toggleSelection = (articleId) => {
     setSelectedArticles((prev) =>
       prev.includes(articleId) ? prev.filter((id) => id !== articleId) : [...prev, articleId]
     );
   };
 
-  // Select or deselect all articles
   const handleSelectAll = () => {
     setSelectedArticles(
       selectedArticles.length === filteredArticles.length
@@ -76,30 +83,22 @@ function ChantierStock() {
     );
   };
 
-  // Open confirmation modal
-  const openConfirmationModal = (article) => {
-    setModalState({ confirmationModal: true, selectedArticle: article });
+  const openModal = (type, article = null, transferType = null) => {
+    setModalState({ type, isOpen: true, article, transferType });
   };
 
-  // Close modal
   const closeModal = () => {
-    setModalState({ confirmationModal: false, selectedArticle: null });
+    setModalState({ type: null, isOpen: false, article: null, transferType: null });
   };
 
-  // Handle delete of an article
   const handleDelete = async () => {
-    const { selectedArticle } = modalState;
-    if (!selectedArticle) return;
+    if (!modalState.article) return;
 
     setLoading(true);
     try {
+      await deleteArticle(modalState.article.id); // Assumes deleteArticle is imported
       toast.success("Article supprimé avec succès.");
-      setStock((prevStock) =>
-        prevStock.filter((article) => article.article_id !== selectedArticle.article_id)
-      );
-      setFilteredArticles((prevFilteredArticles) =>
-        prevFilteredArticles.filter((article) => article.article_id !== selectedArticle.article_id)
-      );
+      fetchStock();
     } catch (error) {
       toast.error("Erreur lors de la suppression de l'article.");
     } finally {
@@ -123,39 +122,58 @@ function ChantierStock() {
                 variant="gradient"
                 bgColor="warning"
                 borderRadius="lg"
-                coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
-                alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
                   Liste des articles en stock
                 </MDTypography>
-                <input
-                  type="text"
-                  className="form-control mb-3 p-2 mx-2"
+                <TextField
+                  variant="outlined"
                   placeholder="Rechercher un article..."
                   value={search}
                   onChange={handleSearch}
+                  size="small"
                   style={{ width: "350px" }}
                 />
+                <div>
+                  <button
+                    className="btn btn-primary me-2 mb-1"
+                    onClick={() => openModal("CommandeModal")}
+                  >
+                    Commander un article
+                  </button>
+                  {selectedArticles.length > 0 && (
+                    <>
+                      <button
+                        className="btn btn-primary me-2 mb-1"
+                        onClick={() => openModal("TransferModal", null, "entrepot")}
+                      >
+                        Transfert vers un Entrepôt
+                      </button>
+                      <button
+                        className="btn btn-primary mb-1"
+                        onClick={() => openModal("TransferModal", null, "chantier")}
+                      >
+                        Transfert vers un autre Chantier
+                      </button>
+                    </>
+                  )}
+                </div>
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
                   <div className="text-center my-3">
-                    <div className="spinner-border" role="status">
-                      <span className="visually-hidden">Chargement...</span>
-                    </div>
+                    <CircularProgress />
                   </div>
                 ) : (
                   <table className="table table-striped">
                     <thead>
                       <tr>
                         <th>
-                          <input
-                            type="checkbox"
-                            onChange={handleSelectAll}
+                          <Checkbox
                             checked={selectedArticles.length === filteredArticles.length}
+                            onChange={handleSelectAll}
                           />
                         </th>
                         <th>Code</th>
@@ -163,8 +181,9 @@ function ChantierStock() {
                         <th>Catégorie</th>
                         <th>Prix Unitaire</th>
                         <th>Prix Total</th>
-                        <th>Quantité Total</th>
+                        <th>Quantité Totale</th>
                         <th>Description</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -172,8 +191,7 @@ function ChantierStock() {
                         filteredArticles.map((article) => (
                           <tr key={article.article_id}>
                             <td>
-                              <input
-                                type="checkbox"
+                              <Checkbox
                                 checked={selectedArticles.includes(article.article_id)}
                                 onChange={() => toggleSelection(article.article_id)}
                               />
@@ -193,11 +211,19 @@ function ChantierStock() {
                               </Badge>
                             </td>
                             <td>{article.article_description || "Aucune description"}</td>
+                            <td>
+                              <button
+                                className="btn btn-warning btn-sm"
+                                onClick={() => openModal("EditStockModal", article)}
+                              >
+                                Modifier le stock
+                              </button>
+                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="7" className="text-center">
+                          <td colSpan="9" className="text-center">
                             Aucun article trouvé.
                           </td>
                         </tr>
@@ -210,20 +236,39 @@ function ChantierStock() {
           </Grid>
         </Grid>
       </MDBox>
-      {modalState.confirmationModal && (
-        <ConfirmationModal
-          article={modalState.selectedArticle}
-          handleDelete={handleDelete}
+      {modalState.isOpen && modalState.type === "EditStockModal" && (
+        <EditStockModal
+          article={modalState.article}
           closeModal={closeModal}
+          refreshArticles={fetchStock}
         />
       )}
-      <Footer />
+      {modalState.isOpen && modalState.type === "CommandeModal" && (
+        <CommandeModal closeModal={closeModal} refreshArticles={fetchStock} />
+      )}
+      {modalState.isOpen && modalState.type === "TransferModal" && (
+        <TransferModal
+          transferType={modalState.transferType}
+          selectedArticles={selectedArticles.map((id) =>
+            stock.find((article) => article.article_id === id)
+          )}
+          closeModal={closeModal}
+          refreshArticles={fetchStock}
+        />
+      )}
+      {modalState.isOpen && modalState.type === "ConfirmationModal" && (
+        <ConfirmationModal
+          article={modalState.article}
+          onConfirm={handleDelete}
+          onCancel={closeModal}
+        />
+      )}
     </DashboardLayout>
   );
 }
 
-ChantierStock.propTypes = {
-  chantierName: PropTypes.number.isRequired,
+StockChantier.propTypes = {
+  chantierName: PropTypes.string,
 };
 
-export default ChantierStock;
+export default StockChantier;

@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getMouvements } from "services/Api/MouvementApi";
 import Pagination from "react-bootstrap/Pagination";
+import { useSelector } from "react-redux";
 import moment from "moment";
 import "moment/locale/fr";
 
@@ -22,6 +23,8 @@ function TransfertArticleListe() {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     fetchMouvements(currentPage);
@@ -118,6 +121,7 @@ function TransfertArticleListe() {
                           <tr>
                             <th>Code</th>
                             <th>Article</th>
+                            <th>Source</th>
                             <th>Destination</th>
                             <th>Prix</th>
                             <th>Quantité</th>
@@ -137,6 +141,11 @@ function TransfertArticleListe() {
                               >
                                 <td className="fw-bold">#{mouvement.article?.code || " "}</td>
                                 <td>{mouvement.article?.name || "N/A"}</td>
+                                <td>
+                                  {mouvement.user?.chantier ||
+                                    mouvement.user?.entrepot ||
+                                    "Administration"}
+                                </td>
                                 <td>
                                   {mouvement.chantier?.name ||
                                     mouvement.entrepot?.name ||

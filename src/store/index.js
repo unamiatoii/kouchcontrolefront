@@ -5,6 +5,7 @@ import { createFilter } from "redux-persist-transform-filter";
 import authReducer from "../domain/authSlice";
 import userReducer from "../domain/userSlice";
 import roleReducer from "../domain/roleSlice";
+import chantierReducer from "../domain/chantierSlice";
 
 // Persist configuration for auth and user slices
 const authFilter = createFilter("auth", ["token", "user"]);
@@ -29,7 +30,8 @@ const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     users: persistedUserReducer,
-    roles: roleReducer, // Non persisté
+    roles: roleReducer,
+    chantier: chantierReducer,
   },
 });
 

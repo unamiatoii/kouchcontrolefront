@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import { getEntrepots } from "services/Api/EntrepotApi";
 import { getChantiers } from "services/Api/ChantierApi";
 import { transferArticlesEntrepotToChantierOrChantierToEntrepot } from "services/Api/ArticleApi";
+import { useSelector } from "react-redux";
 
-function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, refreshArticles }) {
-  const [quantities, setQuantities] = useState(
+function TransferModal({ selectedArticles, transferType, closeModal, refreshArticles }) {
+  const [quantities, setQuantities] = useState(() =>
     selectedArticles.reduce((acc, article) => {
       acc[article.article_id] = "";
       return acc;
@@ -14,33 +15,39 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
   );
   const [errors, setErrors] = useState({});
   const [destinations, setDestinations] = useState([]);
-  const [destinationType, setDestinationType] = useState("");
-  const [destinationId, setDestinationId] = useState("");
+  const [selectedDestination, setSelectedDestination] = useState("");
   const [loading, setLoading] = useState(false);
+  const chantierName = useSelector((state) => state.chantier.chantierName || "chantier-inconnu");
 
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const entrepots = await getEntrepots();
-        const chantiers = await getChantiers();
-        setDestinations([...entrepots, ...chantiers]);
+        const data = transferType === "entrepot" ? await getEntrepots() : await getChantiers();
+        // Filtrer la destination active
+        const filteredDestinations = data.filter(
+          (destination) => destination.name !== chantierName
+        );
+        setDestinations(filteredDestinations);
       } catch (error) {
         toast.error("Erreur lors de la récupération des destinations.");
       }
     };
     fetchDestinations();
-  }, []);
+  }, [transferType, chantierName]);
 
   const handleQuantityChange = (articleId, value) => {
     const quantity = Number(value);
     const article = selectedArticles.find((a) => a.article_id === articleId);
-    const availableQuantity = article.total_quantity;
 
+    if (!article) return;
+
+    const availableQuantity = article.total_quantity || 0;
     let errorMessage = "";
-    if (isNaN(quantity) || quantity < 1) {
+
+    if (quantity > availableQuantity) {
+      errorMessage = `Quantité maximale (${availableQuantity}) dépassée.`;
+    } else if (quantity < 1 || isNaN(quantity)) {
       errorMessage = "Quantité invalide.";
-    } else if (quantity > availableQuantity) {
-      errorMessage = `Quantité saisie dépasse le stock disponible (${availableQuantity}).`;
     }
 
     setErrors((prev) => ({
@@ -50,24 +57,24 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
 
     setQuantities((prev) => ({
       ...prev,
-      [articleId]: errorMessage ? "" : quantity,
+      [articleId]: value,
     }));
   };
 
   const handleSubmit = async () => {
-    if (!destinationType || !destinationId) {
-      toast.error("Veuillez sélectionner une destination.");
-      return;
-    }
-
     const hasErrors = Object.values(errors).some((error) => error);
     const validQuantities = selectedArticles.every((article) => {
       const quantity = Number(quantities[article.article_id]);
-      return quantity > 0 && quantity <= article.total_quantity;
+      return quantity > 0 && quantity <= (article.total_quantity || 0);
     });
 
     if (hasErrors || !validQuantities) {
-      toast.error("Veuillez corriger les erreurs de quantité.");
+      toast.error("Corrigez les erreurs ou entrez des quantités valides.");
+      return;
+    }
+
+    if (!selectedDestination) {
+      toast.error("Sélectionnez une destination.");
       return;
     }
 
@@ -75,18 +82,16 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
 
     try {
       const payload = {
-        source_type: transferType, // "entrepot" ou "chantier"
-        source_id:
-          selectedArticles[0]?.[transferType === "entrepot" ? "entrepot_id" : "chantier_id"], // ID de la source
-        destination_type: transferType === "entrepot" ? "chantier" : "entrepot", // Destination opposée
-        destination_id: Number(selectedDestination), // ID de la destination sélectionnée
         articles: selectedArticles.map((article) => ({
           article_id: article.article_id,
           quantity: Number(quantities[article.article_id]),
         })),
+        chantier_id: transferType === "chantier" ? Number(selectedDestination) : null,
+        entrepot_id: transferType === "entrepot" ? Number(selectedDestination) : null,
       };
 
       await transferArticlesEntrepotToChantierOrChantierToEntrepot(payload);
+
       toast.success("Transfert effectué avec succès.");
       refreshArticles();
       closeModal();
@@ -98,11 +103,15 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
   };
 
   return (
-    <div className="modal show d-block" tabIndex="-1" role="dialog">
+    <div className="modal show d-block" tabIndex="-1" role="dialog" aria-modal="true">
       <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: "50%" }}>
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Transfert d&apos;articles</h5>
+            <h5 className="modal-title">
+              {transferType === "entrepot"
+                ? "Transfert vers un Entrepôt"
+                : "Transfert vers un Chantier"}
+            </h5>
           </div>
           <div className="modal-body">
             <table className="table table-bordered">
@@ -117,14 +126,14 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
               <tbody>
                 {selectedArticles.map((article) => (
                   <tr key={article.article_id}>
-                    <td>{article.article_code}</td>
-                    <td>{article.article_name}</td>
-                    <td>{article.total_quantity}</td>
+                    <td>{article.article_code || article.article_id}</td>
+                    <td>{article.article_name || "Article sans nom"}</td>
+                    <td>{article.total_quantity || 0}</td>
                     <td>
                       <input
                         type="number"
                         className={`form-control ${errors[article.article_id] ? "is-invalid" : ""}`}
-                        value={quantities[article.article_id] || ""}
+                        value={quantities[article.article_id]}
                         onChange={(e) => handleQuantityChange(article.article_id, e.target.value)}
                         min="1"
                       />
@@ -137,11 +146,15 @@ function TransferModal({ selectedArticles, sourceType, sourceId, closeModal, ref
               </tbody>
             </table>
             <div className="mb-3">
-              <label className="form-label">Sélectionnez une destination</label>
+              <label className="form-label">
+                {transferType === "entrepot"
+                  ? "Sélectionnez un Entrepôt"
+                  : "Sélectionnez un Chantier"}
+              </label>
               <select
                 className="form-control form-select"
-                value={destinationId}
-                onChange={(e) => setDestinationId(e.target.value)}
+                value={selectedDestination}
+                onChange={(e) => setSelectedDestination(e.target.value)}
                 required
               >
                 <option value="">-- Sélectionnez une destination --</option>
@@ -176,14 +189,14 @@ TransferModal.propTypes = {
   selectedArticles: PropTypes.arrayOf(
     PropTypes.shape({
       article_id: PropTypes.number.isRequired,
-      article_code: PropTypes.string.isRequired,
-      article_name: PropTypes.string.isRequired,
-      total_quantity: PropTypes.number.isRequired,
+      article_code: PropTypes.string,
+      article_name: PropTypes.string,
+      total_quantity: PropTypes.number,
     })
   ).isRequired,
-  sourceType: PropTypes.string.isRequired,
-  sourceId: PropTypes.number.isRequired,
+  transferType: PropTypes.string.isRequired,
   closeModal: PropTypes.func.isRequired,
+  chantierName: PropTypes.string,
   refreshArticles: PropTypes.func.isRequired,
 };
 

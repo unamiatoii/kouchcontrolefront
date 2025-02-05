@@ -67,6 +67,8 @@ const authSlice = createSlice({
           name: user.name,
           email: user.email,
           role: user.role?.name, // Transforme le rôle si nécessaire
+          chantier: user.chantier?.name,
+          entrepot: user.entrepot?.name,
         };
         state.isAuthenticated = true;
         state.loading = false;

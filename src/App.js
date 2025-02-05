@@ -7,7 +7,6 @@ import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import theme from "assets/theme";
 import themeDark from "assets/theme-dark";
-import routes from "routes"; // Ensure this contains routes with proper children
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logos/logo.jpeg";
 import brandDark from "assets/images/logos/logo.jpeg";
@@ -16,12 +15,15 @@ import Dashboard from "layouts/dashboard";
 import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import { logoutUser } from "./domain/authSlice";
+import { fetchChantier } from "./domain/chantierSlice";
 import ChantierStock from "pages/chantiers/ChantierStock";
 import EntrepotStock from "pages/entrepots/EntrepotStock";
+import getRoutes from "./routes"; // Ensure this function returns valid route data
 
 export default function App() {
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { chantierName } = useSelector((state) => state.chantier);
 
   const [controller, materialDispatch] = useMaterialUIController();
   const {
@@ -41,6 +43,10 @@ export default function App() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
+
+  useEffect(() => {
+    dispatch(fetchChantier());
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -63,8 +69,8 @@ export default function App() {
 
   const handleConfiguratorOpen = () => setOpenConfigurator(materialDispatch, !openConfigurator);
 
-  const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
+  const getRoutesComponents = (allRoutes) =>
+    allRoutes.flatMap((route) => {
       if (route.children) {
         return route.children.map((childRoute) => (
           <Route
@@ -78,7 +84,7 @@ export default function App() {
       if (route.route) {
         return <Route exact path={route.route} element={route.component} key={route.key} />;
       }
-      return null;
+      return [];
     });
 
   const configsButton = (
@@ -105,6 +111,8 @@ export default function App() {
     </MDBox>
   );
 
+  const routes = getRoutes();
+
   return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
@@ -121,25 +129,27 @@ export default function App() {
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
               user={user}
+              chantierName={chantierName}
               onLogout={handleLogout}
             />
           )}
           {configsButton}
           <Routes>
-            {getRoutes(routes)}
+            {getRoutesComponents(routes)}
             <Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Route
+              path="/chantier-stock/:chantierName"
+              element={<ChantierStock chantierName={chantierName} />}
+            />
+            <Route path="/stock/entrepot/:entrepotName" element={<EntrepotStock />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/chantier-stock/:chantierId" element={<ChantierStock />} />
-            <Route path="/stock/entrepot/:entrepotId" element={<EntrepotStock />} />
           </Routes>
         </>
       ) : (
-        <>
-          <Routes>
-            <Route path="/" element={<SignIn />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </>
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       )}
     </ThemeProvider>
   );

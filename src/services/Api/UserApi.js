@@ -45,6 +45,20 @@ export const getChefsChantiers = async () => {
     throw error;
   }
 };
+// Fonction pour récupérer le chantier
+export const getUserChantier = async () => {
+  try {
+    const response = await API_URL.get("/chantier");
+    return response.data;
+    console.log(response.data);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du chantier :",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
 // Fonction pour récupérer tous les utilisateurs
 export const getUsers = async () => {
   try {
@@ -109,6 +123,18 @@ export const deleteUser = async (id) => {
   } catch (error) {
     console.error(
       `Erreur lors de la suppression de l'utilisateur avec ID ${id}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const getActivitiesHistorique = async () => {
+  try {
+    const response = await API_URL.get("/activities/historique");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des activités :",
       error.response?.data || error.message
     );
     throw error;

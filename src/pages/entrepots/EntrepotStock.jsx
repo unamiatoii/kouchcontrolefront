@@ -24,13 +24,13 @@ function EntrepotStock() {
     selectedArticle: null,
   });
   const [selectedArticles, setSelectedArticles] = useState([]);
-  const { entrepotId } = useParams();
+  const { entrepotName } = useParams();
 
   // Function to fetch stock data for the entrepot
   useEffect(() => {
-    if (entrepotId) {
+    if (entrepotName) {
       setLoading(true);
-      getStockEntrepot(entrepotId)
+      getStockEntrepot(entrepotName)
         .then((data) => {
           if (data.length === 0) {
             toast.warn("Aucun stock trouvé pour ce entrepot.");
@@ -46,10 +46,10 @@ function EntrepotStock() {
           setLoading(false);
         });
     } else {
-      console.error("ID du entrepot manquant.");
-      toast.error("L'ID du entrepot est manquant.");
+      console.error("Nom de l'entrepot manquant.");
+      toast.error("Nom de l'entrepot manquant.");
     }
-  }, [entrepotId]);
+  }, [entrepotName]);
 
   // Search filter function
   const handleSearch = (e) => {
@@ -195,12 +195,7 @@ function EntrepotStock() {
                             </td>
                             <td>{article.article_description || "Aucune description"}</td>
                             <td>
-                              <button
-                                className="btn btn-danger btn-sm"
-                                onClick={() => openConfirmationModal(article)}
-                              >
-                                Supprimer
-                              </button>
+                              <button className="btn btn-warning btn-sm me-2">Modifier</button>
                             </td>
                           </tr>
                         ))
@@ -232,7 +227,7 @@ function EntrepotStock() {
 }
 
 EntrepotStock.propTypes = {
-  entrepotId: PropTypes.number.isRequired,
+  //entrepotId: PropTypes.number.isRequired,
 };
 
 export default EntrepotStock;

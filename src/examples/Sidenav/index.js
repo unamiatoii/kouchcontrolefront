@@ -17,12 +17,14 @@ import {
   setWhiteSidenav,
 } from "context";
 
-function Sidenav({ user, routes, onLogout, brand, brandName, ...rest }) {
+function Sidenav({ user, routes, onLogout, brand, brandName, chantierName, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const [activeMenus, setActiveMenus] = useState({});
   const role = user?.role || "";
+  const chantier = user?.chantier || "";
+  const entrepot = user?.entrepot || "";
 
   const textColor = transparentSidenav || (whiteSidenav && !darkMode) ? "dark" : "white";
 
@@ -163,9 +165,12 @@ Sidenav.propTypes = {
   user: PropTypes.shape({
     name: PropTypes.string,
     role: PropTypes.string,
+    chantier: PropTypes.string,
+    entrepot: PropTypes.string,
   }).isRequired,
   brand: PropTypes.string,
   brandName: PropTypes.string,
+  chantierName: PropTypes.string,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,

@@ -99,15 +99,15 @@ export const deleteStock = async (id) => {
 };
 
 // Voir le stock d'un chantier
-export const getStockChantier = async (chantierId) => {
-  if (!chantierId) {
+export const getStockChantier = async (chantierName) => {
+  if (!chantierName) {
     throw new Error("L'ID du chantier est manquant.");
   }
 
   try {
-    const response = await API_URL.get(`/chantier/${chantierId}`);
+    const response = await API_URL.get(`/chantier/${chantierName}`);
     if (!response.data || response.data.length === 0) {
-      throw new Error(`Aucun stock trouvé pour le chantier avec ID ${chantierId}.`);
+      throw new Error(`Aucun stock trouvé pour le chantier avec ID ${chantierName}.`);
     }
     return response.data;
   } catch (error) {
@@ -120,9 +120,9 @@ export const getStockChantier = async (chantierId) => {
 };
 
 // Voir le stock d'un entrepot
-export const getStockEntrepot = async (entrepotId) => {
+export const getStockEntrepot = async (entrepotName) => {
   try {
-    const response = await API_URL.get(`/entrepot/${entrepotId}`);
+    const response = await API_URL.get(`/entrepot/${entrepotName}`);
     return response.data;
   } catch (error) {
     console.error(
